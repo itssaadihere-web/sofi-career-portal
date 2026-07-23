@@ -79,7 +79,7 @@ export default function JobCard({ job, isSaved = false, onToggleSave }: JobCardP
               <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mt-0.5">
                 <span>{job.company_name}</span>
                 {job.is_verified && (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" title="Verified Employer" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" aria-label="Verified Employer" />
                 )}
               </div>
             </div>
