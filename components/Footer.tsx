@@ -9,11 +9,8 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Logo width={110} height={35} />
-              <span className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-                Careers
-              </span>
+            <div className="flex items-center">
+              <Logo width={120} height={40} />
             </div>
             <p className="text-xs text-slate-500 leading-relaxed">
               AI-powered career platform connecting ATS-optimized candidates with leading employers across Pakistan and Gulf.

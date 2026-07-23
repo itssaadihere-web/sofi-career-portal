@@ -69,18 +69,13 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center relative h-16 w-[96px]">
-            <Link
-              href="/"
-              className="absolute -top-1 left-0 z-20 hover:scale-105 transition-all bg-white rounded-full p-1.5 shadow-lg border border-slate-100/50 flex items-center justify-center"
-            >
-              <Logo width={88} height={88} showTagline={true} />
-            </Link>
-          </div>
-          <span className="text-xs font-extrabold uppercase text-gold-700 bg-gold-50 px-2 py-0.5 rounded-md border border-gold-200 tracking-wider ml-2">
-            Careers
-          </span>
+        <div className="flex items-center relative h-16 w-[96px]">
+          <Link
+            href="/"
+            className="absolute -top-1 left-0 z-20 hover:scale-105 transition-all bg-white rounded-full p-1.5 shadow-lg border border-slate-100/50 flex items-center justify-center"
+          >
+            <Logo width={88} height={88} showTagline={true} />
+          </Link>
         </div>
 
         {/* Navigation Links */}
