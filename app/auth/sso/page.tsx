@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import { Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-export default function SSOPage() {
+function SSOContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const supabase = getClientSupabase()
@@ -45,5 +45,17 @@ export default function SSOPage() {
       <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       <p className="mt-4 text-xs font-semibold text-slate-500">Signing you in securely via Sophi SSO...</p>
     </div>
+  )
+}
+
+export default function SSOPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[400px] flex-col items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <SSOContent />
+    </Suspense>
   )
 }

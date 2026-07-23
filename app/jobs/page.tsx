@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
-import { Search, Filter, RotateCcw, Briefcase } from 'lucide-react'
+import { Search, Filter, RotateCcw, Briefcase, Loader2 } from 'lucide-react'
 
-export default function JobsPage() {
+function JobsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = getClientSupabase()
@@ -24,7 +24,6 @@ export default function JobsPage() {
   // Jobs data
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [savedJobIds, setSavedJobIds] = useState<string[]>([])
 
   const CITIES = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Peshawar', 'Remote']
   const INDUSTRIES = ['Technology & IT', 'Finance & Banking', 'Marketing & Sales', 'Engineering', 'Healthcare', 'Customer Support']
@@ -71,7 +70,6 @@ export default function JobsPage() {
       const { data, error } = await query
 
       if (!error && data) {
-        // Client-side filter for keyword & checkbox arrays
         let filtered = data
 
         if (keyword.trim()) {
@@ -147,7 +145,7 @@ export default function JobsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Sidebar Filters (25% ~ 3.5/12 cols) */}
+        {/* Sidebar Filters */}
         <aside className="lg:col-span-4 xl:col-span-3 space-y-6 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <span className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
@@ -276,9 +274,8 @@ export default function JobsPage() {
           </div>
         </aside>
 
-        {/* Main Jobs Listing Area (75% ~ 8.5/12 cols) */}
+        {/* Main Jobs Listing Area */}
         <main className="lg:col-span-8 xl:col-span-9 space-y-6">
-          {/* Header Controls */}
           <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <span className="text-xs font-extrabold text-slate-700">
               Showing <span className="text-blue-600">{jobs.length}</span> open roles
@@ -298,7 +295,6 @@ export default function JobsPage() {
             </div>
           </div>
 
-          {/* Job List */}
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3, 4].map(i => (
@@ -327,5 +323,17 @@ export default function JobsPage() {
         </main>
       </div>
     </div>
+  )
+}
+
+export default function JobsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[400px] flex-col items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <JobsContent />
+    </Suspense>
   )
 }

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import { Briefcase, User as UserIcon, LogOut, PlusCircle, Sparkles } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Logo from './Logo'
 
 export default function Header() {
   const router = useRouter()
@@ -69,18 +70,11 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white font-black text-xl shadow-md group-hover:scale-105 transition-transform">
-              S
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-slate-900 text-lg leading-tight tracking-tight">
-                Sophi<span className="text-blue-600">Careers</span>
-              </span>
-              <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
-                AI Job Matching
-              </span>
-            </div>
+          <Link href="/" className="flex items-center gap-2 group hover:scale-105 transition-transform">
+            <Logo width={120} height={40} />
+            <span className="text-xs font-black uppercase text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 tracking-wider">
+              Careers
+            </span>
           </Link>
 
           {/* Navigation Links */}

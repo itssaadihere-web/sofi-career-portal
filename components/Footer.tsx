@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Logo from './Logo'
 
 export default function Footer() {
   const CV_BUILDER_URL = process.env.NEXT_PUBLIC_CV_BUILDER_URL || 'https://joinsophi.com'
@@ -9,11 +10,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-lg">
-                S
-              </div>
-              <span className="font-extrabold text-slate-900 text-lg">
-                Sophi<span className="text-blue-600">Careers</span>
+              <Logo width={110} height={35} />
+              <span className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                Careers
               </span>
             </div>
             <p className="text-xs text-slate-500 leading-relaxed">
