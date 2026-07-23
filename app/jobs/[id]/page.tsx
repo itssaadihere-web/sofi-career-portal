@@ -42,7 +42,9 @@ export default function SingleJobPage() {
       if (!jobId) return
 
       // Increment views count silently
-      supabase.rpc('increment_job_views', { job_id_param: jobId }).catch(() => {})
+      try {
+        await supabase.rpc('increment_job_views', { job_id_param: jobId })
+      } catch (err) {}
 
       // Fetch job details
       const { data: jobData, error } = await supabase
