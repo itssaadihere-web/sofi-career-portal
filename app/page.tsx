@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
-import { Search, MapPin, Sparkles, Building2, Briefcase, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Search, MapPin, Sparkles, Building2, Briefcase, ArrowRight } from 'lucide-react'
 
 export default function Homepage() {
   const router = useRouter()
@@ -25,7 +25,6 @@ export default function Homepage() {
 
   useEffect(() => {
     async function loadData() {
-      // Fetch featured or active jobs
       const { data: jobs } = await supabase
         .from('jobs')
         .select('*')
@@ -36,7 +35,6 @@ export default function Homepage() {
 
       if (jobs) setFeaturedJobs(jobs)
 
-      // Fetch live stats counts
       const { count: jobCount } = await supabase
         .from('jobs')
         .select('*', { count: 'exact', head: true })
@@ -73,17 +71,17 @@ export default function Homepage() {
 
   return (
     <div className="space-y-16 pb-16">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-900 via-blue-800 to-slate-900 text-white py-20 px-4 sm:px-6 lg:px-8">
+      {/* Hero Section — Primary Navy Gradient */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary-950 via-primary-900 to-slate-900 text-white py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl text-center space-y-8 relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/20 border border-blue-400/30 px-4 py-1.5 text-xs font-bold text-blue-200 backdrop-blur-md">
-            <Sparkles className="h-4 w-4 text-amber-400" />
+          <div className="inline-flex items-center gap-2 rounded-full bg-gold-500/20 border border-gold-400/30 px-4 py-1.5 text-xs font-extrabold text-gold-300 backdrop-blur-md">
+            <Sparkles className="h-4 w-4 text-gold-400" />
             <span>AI-POWERED CAREER MATCHING</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
             Find Your Next Opportunity — <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gold-300 via-gold-400 to-amber-200 bg-clip-text text-transparent">
               Powered by AI CV Matching
             </span>
           </h1>
@@ -124,23 +122,23 @@ export default function Homepage() {
 
             <button
               type="submit"
-              className="sm:col-span-3 flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-bold text-xs sm:text-sm text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30"
+              className="sm:col-span-3 flex items-center justify-center gap-2 rounded-xl bg-primary-950 px-6 py-3 font-bold text-xs sm:text-sm text-gold-300 hover:bg-primary-900 transition-colors shadow-lg"
             >
               Search Jobs
             </button>
           </form>
 
-          {/* Two CTAs side by side */}
+          {/* CTAs */}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <Link
               href="/jobs"
-              className="px-6 py-3 rounded-xl bg-white text-slate-900 font-extrabold text-sm hover:bg-slate-100 transition-all shadow-md"
+              className="px-6 py-3 rounded-xl bg-gold-400 text-primary-950 font-black text-sm hover:bg-gold-300 transition-all shadow-md"
             >
               Find Jobs
             </Link>
             <Link
               href="/recruiter"
-              className="px-6 py-3 rounded-xl bg-blue-500/30 border border-blue-400/40 text-white font-extrabold text-sm hover:bg-blue-500/40 transition-all"
+              className="px-6 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-extrabold text-sm hover:bg-white/20 transition-all"
             >
               Post a Job (Recruiters)
             </Link>
@@ -152,33 +150,33 @@ export default function Homepage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 rounded-2xl bg-white p-6 shadow-sm border border-slate-200 text-center">
           <div>
-            <div className="text-3xl font-black text-blue-600">{stats.activeJobs}+</div>
+            <div className="text-3xl font-black text-primary-950">{stats.activeJobs}+</div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Active Jobs</div>
           </div>
           <div>
-            <div className="text-3xl font-black text-blue-600">{stats.companies}+</div>
+            <div className="text-3xl font-black text-primary-950">{stats.companies}+</div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Companies Hiring</div>
           </div>
           <div>
-            <div className="text-3xl font-black text-blue-600">{stats.professionals.toLocaleString()}+</div>
+            <div className="text-3xl font-black text-gold-600">{stats.professionals.toLocaleString()}+</div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Professionals Matched</div>
           </div>
           <div>
-            <div className="text-3xl font-black text-blue-600">{stats.cvsOptimized.toLocaleString()}+</div>
+            <div className="text-3xl font-black text-primary-950">{stats.cvsOptimized.toLocaleString()}+</div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">CVs Optimized via Sophi</div>
           </div>
         </div>
       </section>
 
-      {/* Featured Jobs Section */}
+      {/* Featured Jobs */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-black text-slate-900">Featured Job Opportunities</h2>
             <p className="text-xs text-slate-500 mt-1 font-medium">Handpicked opportunities from top employers</p>
           </div>
-          <Link href="/jobs" className="text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-            View all jobs <ArrowRight className="h-4 w-4" />
+          <Link href="/jobs" className="text-sm font-bold text-primary-950 hover:text-gold-600 flex items-center gap-1">
+            View all jobs <ArrowRight className="h-4 w-4 text-gold-500" />
           </Link>
         </div>
 
@@ -205,77 +203,33 @@ export default function Homepage() {
             <Link
               key={ind.name}
               href={`/jobs?industry=${encodeURIComponent(ind.name)}`}
-              className="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-400 hover:shadow-md transition-all text-center group"
+              className="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 bg-white hover:border-gold-400 hover:shadow-md transition-all text-center group"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors mb-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-950 font-bold group-hover:bg-primary-950 group-hover:text-gold-400 transition-colors mb-3">
                 <Building2 className="h-5 w-5" />
               </div>
-              <span className="text-xs font-bold text-slate-900 group-hover:text-blue-600 line-clamp-1">{ind.name}</span>
+              <span className="text-xs font-bold text-slate-900 group-hover:text-primary-950 line-clamp-1">{ind.name}</span>
               <span className="text-[10px] text-slate-400 font-semibold mt-1">{ind.count}</span>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* How It Works — Seekers & Recruiters */}
-      <section className="bg-slate-100 py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl space-y-12">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black text-slate-900">How Sophi Platform Works</h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-xl mx-auto">
-              Connecting ATS-ready job seekers with forward-thinking employers in 3 simple steps
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 space-y-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-extrabold text-lg">
-                1
-              </div>
-              <h3 className="font-bold text-slate-900 text-lg">Optimize Your CV</h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Use Sophi AI at joinsophi.com to analyze your CV against target job roles and extract top ATS keywords.
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 space-y-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-extrabold text-lg">
-                2
-              </div>
-              <h3 className="font-bold text-slate-900 text-lg">See Real Match Scores</h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Browse listings on Sophi Careers. Our algorithm calculates instant keyword match percentages for every role.
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 space-y-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-extrabold text-lg">
-                3
-              </div>
-              <h3 className="font-bold text-slate-900 text-lg">Apply in One Click</h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Submit your optimized Sophi CV directly to recruiters. Get notified as soon as your application status changes.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* For Recruiters Banner */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-gradient-to-r from-blue-900 to-indigo-900 p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="rounded-3xl bg-gradient-to-r from-primary-950 to-primary-900 p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-4 max-w-xl">
-            <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-xs font-bold text-blue-200">
+            <span className="px-3 py-1 rounded-full bg-gold-500/20 border border-gold-400/30 text-xs font-extrabold text-gold-300">
               EMPLOYER PORTAL
             </span>
             <h2 className="text-3xl font-black leading-tight">Post Your Job & Reach Verified ATS Talent</h2>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
               Stop sifting through hundreds of irrelevant CVs. Sophi automatically scores applicants so you interview top matches first.
             </p>
           </div>
           <Link
             href="/recruiter"
-            className="px-8 py-4 rounded-2xl bg-white text-blue-900 font-black text-sm hover:bg-slate-100 transition-all shadow-lg shrink-0"
+            className="px-8 py-4 rounded-2xl bg-gold-400 text-primary-950 font-black text-sm hover:bg-gold-300 transition-all shadow-lg shrink-0"
           >
             Post a Job Free →
           </Link>

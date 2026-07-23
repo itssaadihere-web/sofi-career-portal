@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
-import { Briefcase, User as UserIcon, LogOut, PlusCircle, Sparkles } from 'lucide-react'
+import { User as UserIcon, LogOut, PlusCircle, Sparkles } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Logo from './Logo'
 
@@ -78,36 +78,35 @@ export default function Header() {
               <Logo width={88} height={88} showTagline={true} />
             </Link>
           </div>
-          <span className="text-xs font-black uppercase text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 tracking-wider ml-2">
+          <span className="text-xs font-extrabold uppercase text-gold-700 bg-gold-50 px-2 py-0.5 rounded-md border border-gold-200 tracking-wider ml-2">
             Careers
           </span>
         </div>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600">
-            <Link href="/jobs" className={`hover:text-blue-600 transition-colors ${pathname === '/jobs' ? 'text-blue-600 font-bold' : ''}`}>
-              Browse Jobs
-            </Link>
-            <Link href="/companies" className={`hover:text-blue-600 transition-colors ${pathname === '/companies' ? 'text-blue-600 font-bold' : ''}`}>
-              Companies
-            </Link>
-            <a
-              href={CV_BUILDER_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-slate-600 hover:text-blue-600 transition-colors"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              Build/Optimize CV
-            </a>
-          </nav>
-        </div>
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-slate-700">
+          <Link href="/jobs" className={`hover:text-primary transition-colors ${pathname === '/jobs' ? 'text-primary font-extrabold' : ''}`}>
+            Browse Jobs
+          </Link>
+          <Link href="/companies" className={`hover:text-primary transition-colors ${pathname === '/companies' ? 'text-primary font-extrabold' : ''}`}>
+            Companies
+          </Link>
+          <a
+            href={CV_BUILDER_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-slate-700 hover:text-gold transition-colors"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-gold-500" />
+            Build/Optimize CV
+          </a>
+        </nav>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
           <Link
             href="/recruiter"
-            className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-slate-100 transition-all"
+            className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-primary px-3 py-2 rounded-lg hover:bg-slate-100 transition-all"
           >
             For Recruiters
           </Link>
@@ -116,18 +115,18 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <Link
                 href={isRecruiter ? '/recruiter/dashboard' : '/dashboard'}
-                className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-all"
+                className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3.5 py-2 text-xs font-bold text-primary-950 hover:bg-slate-200 transition-all"
               >
-                <UserIcon className="h-3.5 w-3.5 text-blue-600" />
+                <UserIcon className="h-3.5 w-3.5 text-gold-600" />
                 <span>{isRecruiter ? 'Recruiter Dashboard' : 'My Dashboard'}</span>
               </Link>
 
               {isRecruiter && (
                 <Link
                   href="/recruiter/post-job"
-                  className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all"
+                  className="flex items-center gap-1.5 rounded-xl bg-primary-950 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-900 transition-all"
                 >
-                  <PlusCircle className="h-3.5 w-3.5" />
+                  <PlusCircle className="h-3.5 w-3.5 text-gold-400" />
                   <span>Post a Job</span>
                 </Link>
               )}
@@ -135,7 +134,7 @@ export default function Header() {
               <button
                 onClick={handleSignOut}
                 className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-all"
-                title="Sign Out"
+                aria-label="Sign Out"
               >
                 <LogOut className="h-4 w-4" />
               </button>
@@ -150,7 +149,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/recruiter/post-job"
-                className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all"
+                className="rounded-xl bg-primary-950 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-900 transition-all"
               >
                 Post Job
               </Link>
