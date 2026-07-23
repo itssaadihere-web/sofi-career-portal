@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         if (res.ok) {
           const data = await res.json()
           const content = data.choices?.[0]?.message?.content || ''
-          const match = content.match(/\[.*\]/s)
+          const match = content.match(/\[[\s\S]*\]/)
           if (match) {
             keywords = JSON.parse(match[0])
           }
