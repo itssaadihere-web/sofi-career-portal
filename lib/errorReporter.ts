@@ -14,6 +14,36 @@ export interface ErrorReportParams {
 }
 
 /**
+ * Checks if an error is a User Assistance / Guidance Error (e.g. credit limits, file format, invalid input)
+ * These errors should be shown clearly to the user on the UI and do NOT trigger technical support emails.
+ */
+export function isUserGuidanceError(message: string): boolean {
+  const msgLower = (message || '').toLowerCase()
+  const userGuidanceKeywords = [
+    'credit',
+    'insufficient',
+    'limit reached',
+    'wrong file',
+    'invalid format',
+    'file format',
+    'pdf or docx',
+    'file size',
+    'exceeds',
+    'incorrect password',
+    'invalid login',
+    'already registered',
+    'email taken',
+    'required field',
+    'fill in all',
+    'unauthorized access',
+    'please sign in',
+    'payment required',
+  ]
+
+  return userGuidanceKeywords.some(keyword => msgLower.includes(keyword))
+}
+
+/**
  * Generates automated heuristic diagnostic and possible solution based on error string
  */
 function analyzePossibleSolution(message: string, stack?: string): string {
@@ -38,6 +68,11 @@ function analyzePossibleSolution(message: string, stack?: string): string {
 }
 
 export async function sendSystemErrorReport(params: ErrorReportParams) {
+  // Ignore user guidance errors (e.g. credits ended, wrong file format) for technical system error reporting
+  if (isUserGuidanceError(params.errorMessage)) {
+    return
+  }
+
   const timestamp = new Date().toISOString()
   const formattedDate = new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' }) + ' (PKT)'
   const possibleSolution = analyzePossibleSolution(params.errorMessage, params.errorStack)
