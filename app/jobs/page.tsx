@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
-import { Search, Filter, RotateCcw, Briefcase, Loader2 } from 'lucide-react'
+import { Search, Filter, RotateCcw, Briefcase, Loader2, Sparkles } from 'lucide-react'
 
 function JobsContent() {
   const router = useRouter()
@@ -19,9 +19,10 @@ function JobsContent() {
   const [employmentTypes, setEmploymentTypes] = useState<string[]>([])
   const [expLevels, setExpLevels] = useState<string[]>([])
   const [minSalary, setMinSalary] = useState(0)
-  const [sortBy, setSortBy] = useState('recent')
+  const [sortBy, setSortBy] = useState('matched')
 
-  // Jobs data
+  // User CV Keywords & Jobs data
+  const [userKeywords, setUserKeywords] = useState<string[]>([])
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -44,6 +45,32 @@ function JobsContent() {
     { id: 'senior', label: 'Senior Level' },
     { id: 'lead', label: 'Lead / Director' },
   ]
+
+  // Fetch logged in user's CV keywords for AI matching
+  useEffect(() => {
+    async function fetchUserCV() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        const { data: cv } = await supabase
+          .from('cv_jobs')
+          .select('gap_analysis, linkedin_optimizer')
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (cv) {
+          const kws = [
+            ...(cv.gap_analysis?.missingKeywords || []),
+            ...(cv.linkedin_optimizer?.skills || []),
+          ].map((k: string) => k.toLowerCase())
+          setUserKeywords(Array.from(new Set(kws)))
+        }
+      }
+    }
+
+    fetchUserCV()
+  }, [supabase])
 
   useEffect(() => {
     async function loadJobs() {
@@ -75,7 +102,7 @@ function JobsContent() {
         if (keyword.trim()) {
           const kw = keyword.toLowerCase()
           filtered = filtered.filter(
-            j =>
+            (j) =>
               j.title.toLowerCase().includes(kw) ||
               j.company_name.toLowerCase().includes(kw) ||
               (j.description && j.description.toLowerCase().includes(kw)) ||
@@ -84,15 +111,47 @@ function JobsContent() {
         }
 
         if (locationTypes.length > 0) {
-          filtered = filtered.filter(j => locationTypes.includes((j.location_type || '').toLowerCase()))
+          filtered = filtered.filter((j) => locationTypes.includes((j.location_type || '').toLowerCase()))
         }
 
         if (employmentTypes.length > 0) {
-          filtered = filtered.filter(j => employmentTypes.includes((j.employment_type || '').toLowerCase()))
+          filtered = filtered.filter((j) => employmentTypes.includes((j.employment_type || '').toLowerCase()))
         }
 
         if (expLevels.length > 0) {
-          filtered = filtered.filter(j => expLevels.includes((j.experience_level || '').toLowerCase()))
+          filtered = filtered.filter((j) => expLevels.includes((j.experience_level || '').toLowerCase()))
+        }
+
+        // Calculate AI Match Score for each job
+        const targetKws =
+          userKeywords.length > 0
+            ? userKeywords
+            : keyword.trim()
+            ? keyword.toLowerCase().split(/\s+/)
+            : []
+
+        filtered = filtered.map((j) => {
+          let score = 60
+          if (targetKws.length > 0) {
+            const jobKws = (j.keywords || []).map((k: string) => k.toLowerCase())
+            const fullText = `${j.title} ${j.description} ${j.requirements}`.toLowerCase()
+
+            let matchCount = 0
+            targetKws.forEach((kw) => {
+              if (jobKws.some((jk: string) => jk.includes(kw) || kw.includes(jk)) || fullText.includes(kw)) {
+                matchCount++
+              }
+            })
+            score = Math.min(99, Math.max(35, Math.round((matchCount / Math.max(targetKws.length, 1)) * 100)))
+          } else {
+            score = Math.min(98, 70 + ((j.keywords?.length || 4) * 2))
+          }
+          return { ...j, match_score: score }
+        })
+
+        // Sort by Most Matched (highest score first)
+        if (sortBy === 'matched') {
+          filtered.sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
         }
 
         setJobs(filtered)
@@ -104,23 +163,34 @@ function JobsContent() {
     }
 
     loadJobs()
-  }, [supabase, selectedCity, selectedIndustry, minSalary, sortBy, keyword, locationTypes, employmentTypes, expLevels])
+  }, [
+    supabase,
+    keyword,
+    selectedCity,
+    selectedIndustry,
+    locationTypes,
+    employmentTypes,
+    expLevels,
+    minSalary,
+    sortBy,
+    userKeywords,
+  ])
 
   const toggleLocationType = (type: string) => {
-    setLocationTypes(prev =>
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    setLocationTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
   }
 
   const toggleEmploymentType = (type: string) => {
-    setEmploymentTypes(prev =>
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    setEmploymentTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
   }
 
   const toggleExpLevel = (level: string) => {
-    setExpLevels(prev =>
-      prev.includes(level) ? prev.filter(l => l !== level) : [...prev, level]
+    setExpLevels((prev) =>
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
     )
   }
 
@@ -132,21 +202,27 @@ function JobsContent() {
     setEmploymentTypes([])
     setExpLevels([])
     setMinSalary(0)
-    router.push('/jobs')
+    setSortBy('matched')
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-black text-slate-900">Explore Active Job Openings</h1>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-          Search and filter 500+ verified positions matching your professional profile
-        </p>
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-900 to-blue-950 p-8 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/20 px-3 py-1 text-xs font-bold text-blue-300 border border-blue-400/20">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" /> AI-Matched Career Opportunities
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black">Explore Jobs in Pakistan</h1>
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-medium">
+            Discover roles matched to your Sophi ATS resume keywords. Apply with 1 click.
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Sidebar Filters */}
-        <aside className="lg:col-span-4 xl:col-span-3 space-y-6 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+        <aside className="lg:col-span-4 xl:col-span-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <span className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
               <Filter className="h-4 w-4 text-blue-600" />
@@ -185,7 +261,11 @@ function JobsContent() {
               className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
             >
               <option value="">All Locations</option>
-              {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+              {CITIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -193,7 +273,7 @@ function JobsContent() {
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase text-slate-500">Work Setup</label>
             <div className="space-y-1.5">
-              {LOCATION_TYPES.map(t => (
+              {LOCATION_TYPES.map((t) => (
                 <label key={t.id} className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
                   <input
                     type="checkbox"
@@ -211,7 +291,7 @@ function JobsContent() {
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase text-slate-500">Employment Type</label>
             <div className="space-y-1.5">
-              {EMPLOYMENT_TYPES.map(t => (
+              {EMPLOYMENT_TYPES.map((t) => (
                 <label key={t.id} className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
                   <input
                     type="checkbox"
@@ -225,24 +305,11 @@ function JobsContent() {
             </div>
           </div>
 
-          {/* Industry Dropdown */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase text-slate-500">Industry</label>
-            <select
-              value={selectedIndustry}
-              onChange={(e) => setSelectedIndustry(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
-            >
-              <option value="">All Industries</option>
-              {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
-            </select>
-          </div>
-
           {/* Experience Level */}
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase text-slate-500">Experience Level</label>
             <div className="space-y-1.5">
-              {EXP_LEVELS.map(l => (
+              {EXP_LEVELS.map((l) => (
                 <label key={l.id} className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
                   <input
                     type="checkbox"
@@ -260,7 +327,7 @@ function JobsContent() {
           <div className="space-y-2">
             <div className="flex justify-between items-center text-xs font-bold text-slate-500 uppercase">
               <span>Min Salary</span>
-              <span className="text-blue-600 font-extrabold">{minSalary > 0 ? `PKR ${(minSalary/1000).toFixed(0)}k+` : 'Any'}</span>
+              <span className="text-blue-600 font-extrabold">{minSalary > 0 ? `PKR ${(minSalary / 1000).toFixed(0)}k+` : 'Any'}</span>
             </div>
             <input
               type="range"
@@ -288,6 +355,7 @@ function JobsContent() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl font-bold text-slate-800 focus:outline-none cursor-pointer"
               >
+                <option value="matched">Most Matched (AI Score ✨)</option>
                 <option value="recent">Most Recent</option>
                 <option value="salary">Salary: High to Low</option>
                 <option value="applications">Most Applied</option>
@@ -297,26 +365,28 @@ function JobsContent() {
 
           {loading ? (
             <div className="space-y-4">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="h-44 bg-slate-200 rounded-2xl animate-pulse" />
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-36 bg-slate-100 rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : jobs.length > 0 ? (
-            <div className="space-y-4">
-              {jobs.map(job => (
+            <div className="grid grid-cols-1 gap-4">
+              {jobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 space-y-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center space-y-4">
               <Briefcase className="h-12 w-12 text-slate-300 mx-auto" />
-              <h3 className="text-base font-bold text-slate-800">No jobs match your current filters</h3>
-              <p className="text-xs text-slate-500">Try broadening your search keywords or resetting city filters.</p>
+              <div className="space-y-1">
+                <h3 className="font-bold text-slate-900 text-lg">No jobs match your criteria</h3>
+                <p className="text-xs text-slate-500">Try adjusting your search terms or resetting filters.</p>
+              </div>
               <button
                 onClick={clearFilters}
-                className="px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 transition-colors inline-block"
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors"
               >
-                Clear All Filters
+                Reset All Filters
               </button>
             </div>
           )}
@@ -328,11 +398,13 @@ function JobsContent() {
 
 export default function JobsPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[400px] flex-col items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[400px] flex-col items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      }
+    >
       <JobsContent />
     </Suspense>
   )
