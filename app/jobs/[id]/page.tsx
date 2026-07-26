@@ -16,6 +16,8 @@ import {
   DollarSign,
   Loader2,
   Check,
+  Eye,
+  Users,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import CompanyLogo from '@/components/CompanyLogo'
@@ -266,6 +268,14 @@ export default function SingleJobPage() {
                   PKR {(job.salary_min / 1000).toFixed(0)}k – {(job.salary_max / 1000).toFixed(0)}k / mo
                 </span>
               )}
+              <span className="flex items-center gap-1.5 text-blue-700 font-bold bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                <Eye className="h-3.5 w-3.5 text-blue-600" />
+                <span>{job.views_count || 1} Views</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+                <Users className="h-3.5 w-3.5 text-emerald-600" />
+                <span>{job.applications_count || 0} Applied</span>
+              </span>
             </div>
           </div>
 
@@ -376,6 +386,27 @@ export default function SingleJobPage() {
                   </a>
                 </div>
               )}
+
+              {/* Role Engagement Stats */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-around text-center text-xs">
+                <div>
+                  <div className="flex items-center justify-center gap-1 font-black text-slate-900 text-sm">
+                    <Eye className="h-4 w-4 text-blue-600" />
+                    <span>{job.views_count || 1}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-semibold uppercase">Total Views</div>
+                </div>
+
+                <div className="h-6 w-px bg-slate-200" />
+
+                <div>
+                  <div className="flex items-center justify-center gap-1 font-black text-emerald-600 text-sm">
+                    <Users className="h-4 w-4 text-emerald-600" />
+                    <span>{job.applications_count || 0}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-semibold uppercase">Applicants</div>
+                </div>
+              </div>
 
               {/* Action Buttons */}
               <div className="space-y-2.5 pt-2 border-t border-slate-100">
