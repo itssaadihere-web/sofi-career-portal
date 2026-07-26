@@ -6,6 +6,19 @@ export interface CompanyBrand {
 }
 
 export const KNOWN_BRAND_MAP: Record<string, { domain: string; industry: string }> = {
+  // Global BPO, Tech & Enterprise Leaders
+  ibex: { domain: 'ibex.co', industry: 'Technology & IT' },
+  'ibex global': { domain: 'ibex.co', industry: 'Technology & IT' },
+  'ibex digital': { domain: 'ibex.co', industry: 'Technology & IT' },
+  afiniti: { domain: 'afiniti.com', industry: 'Technology & IT' },
+  trg: { domain: 'trgworld.com', industry: 'Technology & IT' },
+  's&p global': { domain: 'spglobal.com', industry: 'Finance & Banking' },
+  spglobal: { domain: 'spglobal.com', industry: 'Finance & Banking' },
+  teradata: { domain: 'teradata.com', industry: 'Technology & IT' },
+  sybrid: { domain: 'sybrid.com', industry: 'Technology & IT' },
+  abacus: { domain: 'abacus-global.com', industry: 'Technology & IT' },
+  'abacus consulting': { domain: 'abacus-global.com', industry: 'Technology & IT' },
+
   // Global Big 4 & Management Consulting
   ey: { domain: 'ey.com', industry: 'Finance & Banking' },
   'ernst & young': { domain: 'ey.com', industry: 'Finance & Banking' },
@@ -100,7 +113,7 @@ export function getDomainForCompany(companyName: string): string {
 
   // Fallback domain extraction
   const clean = lower
-    .replace(/\b(pakistan|limited|ltd|inc|pvt|co|corp|corporation|group|llc|solutions|solution|tech|technologies)\b/gi, '')
+    .replace(/\b(pakistan|limited|ltd|inc|pvt|co|corp|corporation|group|llc|solutions|solution|tech|technologies|global|digital)\b/gi, '')
     .trim()
     .replace(/[^\w]/g, '')
 
@@ -115,9 +128,11 @@ export function getCompanyLogoUrl(companyName: string, customDomain?: string): s
 }
 
 export const RENOWNED_BRANDS: CompanyBrand[] = [
+  { name: 'ibex Global', domain: 'ibex.co', logoUrl: 'https://www.google.com/s2/favicons?domain=ibex.co&sz=256', industry: 'Technology & IT' },
   { name: 'EY (Ernst & Young)', domain: 'ey.com', logoUrl: 'https://www.google.com/s2/favicons?domain=ey.com&sz=256', industry: 'Finance & Banking' },
   { name: 'HBL (Habib Bank Limited)', domain: 'hbl.com', logoUrl: 'https://www.google.com/s2/favicons?domain=hbl.com&sz=256', industry: 'Finance & Banking' },
   { name: 'Martin Dow', domain: 'martindow.com', logoUrl: 'https://www.google.com/s2/favicons?domain=martindow.com&sz=256', industry: 'Healthcare' },
+  { name: 'S&P Global', domain: 'spglobal.com', logoUrl: 'https://www.google.com/s2/favicons?domain=spglobal.com&sz=256', industry: 'Finance & Banking' },
   { name: 'PwC', domain: 'pwc.com', logoUrl: 'https://www.google.com/s2/favicons?domain=pwc.com&sz=256', industry: 'Finance & Banking' },
   { name: 'KPMG', domain: 'kpmg.com', logoUrl: 'https://www.google.com/s2/favicons?domain=kpmg.com&sz=256', industry: 'Finance & Banking' },
   { name: 'Deloitte', domain: 'deloitte.com', logoUrl: 'https://www.google.com/s2/favicons?domain=deloitte.com&sz=256', industry: 'Finance & Banking' },
