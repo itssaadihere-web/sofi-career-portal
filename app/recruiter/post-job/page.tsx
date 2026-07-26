@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
-import { Building2, Sparkles, ArrowRight, ArrowLeft, Loader2, CheckCircle2, DollarSign } from 'lucide-react'
+import { Building2, Sparkles, ArrowRight, ArrowLeft, Loader2, CheckCircle2, DollarSign, Bot, Linkedin } from 'lucide-react'
 import toast from 'react-hot-toast'
+import LinkedInJobImporter from '@/components/LinkedInJobImporter'
+import SophiJobCopilot from '@/components/SophiJobCopilot'
 
 export default function PostJobPage() {
   const router = useRouter()
@@ -66,6 +68,25 @@ export default function PostJobPage() {
     checkRecruiter()
   }, [supabase, router])
 
+  // Helper to bulk update state from LinkedIn scraper or Sophi AI
+  const applyFormUpdates = (data: any) => {
+    if (data.title) setTitle(data.title)
+    if (data.department) setDepartment(data.department)
+    if (data.locationCity) setLocationCity(data.locationCity)
+    if (data.locationType) setLocationType(data.locationType)
+    if (data.employmentType) setEmploymentType(data.employmentType)
+    if (data.industry) setIndustry(data.industry)
+    if (data.experienceLevel) setExperienceLevel(data.experienceLevel)
+    if (data.experienceMin !== undefined) setExperienceMin(data.experienceMin)
+    if (data.experienceMax !== undefined) setExperienceMax(data.experienceMax)
+    if (data.description) setDescription(data.description)
+    if (data.responsibilities) setResponsibilities(data.responsibilities)
+    if (data.requirements) setRequirements(data.requirements)
+    if (data.benefits) setBenefits(data.benefits)
+    if (data.salaryMin !== undefined) setSalaryMin(data.salaryMin)
+    if (data.salaryMax !== undefined) setSalaryMax(data.salaryMax)
+  }
+
   const handlePublish = async () => {
     if (!title || !description) {
       toast.error('Please fill in required fields: Job Title and Description')
@@ -123,8 +144,26 @@ export default function PostJobPage() {
     )
   }
 
+  const currentJobState = {
+    title,
+    department,
+    locationCity,
+    locationType,
+    employmentType,
+    industry,
+    experienceLevel,
+    experienceMin,
+    experienceMax,
+    salaryMin,
+    salaryMax,
+    description,
+    responsibilities,
+    requirements,
+    benefits,
+  }
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <div>
@@ -144,281 +183,300 @@ export default function PostJobPage() {
         </div>
       </div>
 
-      {/* STEP 1: Job Details */}
-      {step === 1 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-          <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 1 — Role & Location Details</h2>
+      {/* LinkedIn Job URL Importer Top Banner */}
+      <LinkedInJobImporter onImportSuccess={applyFormUpdates} />
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-bold uppercase text-slate-600">Job Title *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Senior Full Stack Developer"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:outline-none"
-              />
+      {/* Split Layout: Left = Job Form, Right = Sophi AI Voice & Chat Assistant */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Job Form */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* STEP 1: Job Details */}
+          {step === 1 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+              <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 1 — Role & Location Details</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-600">Job Title *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Senior Full Stack Developer"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Department</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Engineering"
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Industry</label>
+                    <select
+                      value={industry}
+                      onChange={(e) => setIndustry(e.target.value)}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none"
+                    >
+                      <option value="Technology & IT">Technology & IT</option>
+                      <option value="Finance & Banking">Finance & Banking</option>
+                      <option value="Marketing & Sales">Marketing & Sales</option>
+                      <option value="Engineering">Engineering</option>
+                      <option value="Healthcare">Healthcare</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">City</label>
+                    <select
+                      value={locationCity}
+                      onChange={(e) => setLocationCity(e.target.value)}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none"
+                    >
+                      <option value="Karachi">Karachi</option>
+                      <option value="Lahore">Lahore</option>
+                      <option value="Islamabad">Islamabad</option>
+                      <option value="Rawalpindi">Rawalpindi</option>
+                      <option value="Faisalabad">Faisalabad</option>
+                      <option value="Peshawar">Peshawar</option>
+                      <option value="Remote">Remote</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Work Setup</label>
+                    <select
+                      value={locationType}
+                      onChange={(e) => setLocationType(e.target.value)}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none capitalize"
+                    >
+                      <option value="onsite">Onsite</option>
+                      <option value="remote">Remote</option>
+                      <option value="hybrid">Hybrid</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Employment Type</label>
+                    <select
+                      value={employmentType}
+                      onChange={(e) => setEmploymentType(e.target.value)}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none capitalize"
+                    >
+                      <option value="full-time">Full-time</option>
+                      <option value="part-time">Part-time</option>
+                      <option value="contract">Contract</option>
+                      <option value="internship">Internship</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Experience Level</label>
+                    <select
+                      value={experienceLevel}
+                      onChange={(e) => setExperienceLevel(e.target.value)}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none capitalize"
+                    >
+                      <option value="entry">Entry Level</option>
+                      <option value="mid">Mid Level</option>
+                      <option value="senior">Senior Level</option>
+                      <option value="lead">Lead / Director</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Min Experience (Years)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={experienceMin}
+                      onChange={(e) => setExperienceMin(Number(e.target.value))}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Max Experience (Years)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={experienceMax}
+                      onChange={(e) => setExperienceMax(Number(e.target.value))}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={() => {
+                    if (!title) toast.error('Job Title is required')
+                    else setStep(2)
+                  }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors shadow-md"
+                >
+                  <span>Next: Job Description</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Department</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Engineering"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:outline-none"
-                />
+          {/* STEP 2: Job Content & Salary */}
+          {step === 2 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+              <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 2 — Job Description & Compensation</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-600">Full Job Description *</label>
+                  <textarea
+                    rows={6}
+                    required
+                    placeholder="Describe role responsibilities, key tasks, team structure..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm leading-relaxed focus:border-blue-600 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-600">Key Requirements (Bulleted)</label>
+                  <textarea
+                    rows={4}
+                    placeholder="• 3+ years experience with React and Node.js..."
+                    value={requirements}
+                    onChange={(e) => setRequirements(e.target.value)}
+                    className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:border-blue-600 focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Salary Min (PKR / Month)</label>
+                    <input
+                      type="number"
+                      step="10000"
+                      value={salaryMin}
+                      onChange={(e) => setSalaryMin(Number(e.target.value))}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase text-slate-600">Salary Max (PKR / Month)</label>
+                    <input
+                      type="number"
+                      step="10000"
+                      value={salaryMax}
+                      onChange={(e) => setSalaryMax(Number(e.target.value))}
+                      className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer pt-2">
+                  <input
+                    type="checkbox"
+                    checked={salaryVisible}
+                    onChange={(e) => setSalaryVisible(e.target.checked)}
+                    className="rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Display salary range publicly on job card</span>
+                </label>
               </div>
 
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Industry</label>
-                <select
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none"
+              <div className="flex justify-between pt-4">
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50"
                 >
-                  <option value="Technology & IT">Technology & IT</option>
-                  <option value="Finance & Banking">Finance & Banking</option>
-                  <option value="Marketing & Sales">Marketing & Sales</option>
-                  <option value="Engineering">Engineering</option>
-                  <option value="Healthcare">Healthcare</option>
-                </select>
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>Back</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (!description) toast.error('Job Description is required')
+                    else setStep(3)
+                  }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors shadow-md"
+                >
+                  <span>Next: Application Settings</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">City</label>
-                <select
-                  value={locationCity}
-                  onChange={(e) => setLocationCity(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none"
-                >
-                  <option value="Karachi">Karachi</option>
-                  <option value="Lahore">Lahore</option>
-                  <option value="Islamabad">Islamabad</option>
-                  <option value="Rawalpindi">Rawalpindi</option>
-                  <option value="Faisalabad">Faisalabad</option>
-                  <option value="Peshawar">Peshawar</option>
-                  <option value="Remote">Remote</option>
-                </select>
+          {/* STEP 3: Settings & Confirm */}
+          {step === 3 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+              <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 3 — Application Settings & Sophi AI Keyword Extraction</h2>
+
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div className="text-xs text-blue-900 leading-relaxed font-medium">
+                    <strong>AI Keyword Extraction Active:</strong> When you publish, Sophi&apos;s AI engine will automatically scan your job description to extract top 15 ATS keywords for candidate matching.
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-600">Application Delivery Email</label>
+                  <input
+                    type="email"
+                    value={applicationEmail}
+                    onChange={(e) => setApplicationEmail(e.target.value)}
+                    className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:outline-none"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Work Setup</label>
-                <select
-                  value={locationType}
-                  onChange={(e) => setLocationType(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none capitalize"
+              <div className="flex justify-between pt-4">
+                <button
+                  onClick={() => setStep(2)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50"
                 >
-                  <option value="onsite">Onsite</option>
-                  <option value="remote">Remote</option>
-                  <option value="hybrid">Hybrid</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Employment Type</label>
-                <select
-                  value={employmentType}
-                  onChange={(e) => setEmploymentType(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none capitalize"
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>Back</span>
+                </button>
+                <button
+                  onClick={handlePublish}
+                  disabled={publishing}
+                  className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-emerald-600 text-white font-extrabold text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 disabled:opacity-60"
                 >
-                  <option value="full-time">Full-time</option>
-                  <option value="part-time">Part-time</option>
-                  <option value="contract">Contract</option>
-                  <option value="internship">Internship</option>
-                </select>
+                  {publishing ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle2 className="h-5 w-5" />}
+                  <span>Publish Job Now</span>
+                </button>
               </div>
             </div>
+          )}
+        </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Experience Level</label>
-                <select
-                  value={experienceLevel}
-                  onChange={(e) => setExperienceLevel(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none capitalize"
-                >
-                  <option value="entry">Entry Level</option>
-                  <option value="mid">Mid Level</option>
-                  <option value="senior">Senior Level</option>
-                  <option value="lead">Lead / Director</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Min Experience (Years)</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={experienceMin}
-                  onChange={(e) => setExperienceMin(Number(e.target.value))}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Max Experience (Years)</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={experienceMax}
-                  onChange={(e) => setExperienceMax(Number(e.target.value))}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <button
-              onClick={() => {
-                if (!title) toast.error('Job Title is required')
-                else setStep(2)
-              }}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors shadow-md"
-            >
-              <span>Next: Job Description</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
+        {/* Right Column: Sophi AI Voice & Chat Assistant */}
+        <div className="lg:col-span-5">
+          <div className="sticky top-6">
+            <SophiJobCopilot
+              currentJobData={currentJobState}
+              onUpdateForm={applyFormUpdates}
+            />
           </div>
         </div>
-      )}
-
-      {/* STEP 2: Job Content & Salary */}
-      {step === 2 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-          <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 2 — Job Description & Compensation</h2>
-
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-bold uppercase text-slate-600">Full Job Description *</label>
-              <textarea
-                rows={6}
-                required
-                placeholder="Describe role responsibilities, key tasks, team structure..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm leading-relaxed focus:border-blue-600 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold uppercase text-slate-600">Key Requirements (Bulleted)</label>
-              <textarea
-                rows={4}
-                placeholder="• 3+ years experience with React and Node.js..."
-                value={requirements}
-                onChange={(e) => setRequirements(e.target.value)}
-                className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:border-blue-600 focus:outline-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Salary Min (PKR / Month)</label>
-                <input
-                  type="number"
-                  step="10000"
-                  value={salaryMin}
-                  onChange={(e) => setSalaryMin(Number(e.target.value))}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-600">Salary Max (PKR / Month)</label>
-                <input
-                  type="number"
-                  step="10000"
-                  value={salaryMax}
-                  onChange={(e) => setSalaryMax(Number(e.target.value))}
-                  className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs font-semibold focus:border-blue-600 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer pt-2">
-              <input
-                type="checkbox"
-                checked={salaryVisible}
-                onChange={(e) => setSalaryVisible(e.target.checked)}
-                className="rounded text-blue-600 focus:ring-blue-500"
-              />
-              <span>Display salary range publicly on job card</span>
-            </label>
-          </div>
-
-          <div className="flex justify-between pt-4">
-            <button
-              onClick={() => setStep(1)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back</span>
-            </button>
-            <button
-              onClick={() => {
-                if (!description) toast.error('Job Description is required')
-                else setStep(3)
-              }}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors shadow-md"
-            >
-              <span>Next: Application Settings</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* STEP 3: Settings & Confirm */}
-      {step === 3 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-          <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 3 — Application Settings & Kimi AI Keyword Extraction</h2>
-
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-start gap-3">
-              <Sparkles className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-              <div className="text-xs text-blue-900 leading-relaxed font-medium">
-                <strong>AI Keyword Extraction Active:</strong> When you publish, Sophi&apos;s Kimi AI engine will automatically scan your job description to extract top 15 ATS keywords for candidate matching.
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold uppercase text-slate-600">Application Delivery Email</label>
-              <input
-                type="email"
-                value={applicationEmail}
-                onChange={(e) => setApplicationEmail(e.target.value)}
-                className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-between pt-4">
-            <button
-              onClick={() => setStep(2)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back</span>
-            </button>
-            <button
-              onClick={handlePublish}
-              disabled={publishing}
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-emerald-600 text-white font-extrabold text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 disabled:opacity-60"
-            >
-              {publishing ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle2 className="h-5 w-5" />}
-              <span>Publish Job Now</span>
-            </button>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   )
 }
