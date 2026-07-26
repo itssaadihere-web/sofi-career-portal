@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getCompanyLogoUrl } from '@/lib/brands'
+import { getCompanyLogoUrl, getDomainForCompany } from '@/lib/brands'
 
 interface CompanyLogoProps {
   companyName: string
@@ -16,21 +16,35 @@ export default function CompanyLogo({
   className = '',
   sizeClassName = 'h-12 w-12 text-base',
 }: CompanyLogoProps) {
-  const initialSrc = logoUrl || getCompanyLogoUrl(companyName)
-  const [src, setSrc] = useState(initialSrc)
-  const [hasError, setHasError] = useState(false)
+  const domain = getDomainForCompany(companyName)
+  const primarySrc = logoUrl || getCompanyLogoUrl(companyName, domain)
+
+  const [src, setSrc] = useState(primarySrc)
+  const [errorCount, setErrorCount] = useState(0)
 
   useEffect(() => {
-    const resolved = logoUrl || getCompanyLogoUrl(companyName)
+    const resolvedDomain = getDomainForCompany(companyName)
+    const resolved = logoUrl || getCompanyLogoUrl(companyName, resolvedDomain)
     setSrc(resolved)
-    setHasError(false)
+    setErrorCount(0)
   }, [logoUrl, companyName])
 
   const handleError = () => {
-    setHasError(true)
+    if (errorCount === 0) {
+      // Secondary CDN: Clearbit logo
+      setSrc(`https://logo.clearbit.com/${domain}`)
+      setErrorCount(1)
+    } else if (errorCount === 1) {
+      // Tertiary CDN: IconHorse
+      setSrc(`https://icon.horse/icon/${domain}`)
+      setErrorCount(2)
+    } else {
+      // Final fallback: gradient badge
+      setErrorCount(3)
+    }
   }
 
-  // Generate 2-letter uppercase initials (e.g. "Qualix Solution Pakistan" -> "QS")
+  // Initial calculation for initials fallback if all 3 CDNs fail
   const words = (companyName || 'Company')
     .trim()
     .split(/\s+/)
@@ -45,7 +59,7 @@ export default function CompanyLogo({
     <div
       className={`flex shrink-0 items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-1 overflow-hidden shadow-2xs ${sizeClassName} ${className}`}
     >
-      {src && !hasError ? (
+      {src && errorCount < 3 ? (
         <img
           src={src}
           alt={companyName}
