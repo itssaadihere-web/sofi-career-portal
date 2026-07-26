@@ -16,12 +16,11 @@ export const RENOWNED_BRANDS: CompanyBrand[] = [
   { name: 'Contour Software', domain: 'contour-software.com', logoUrl: 'https://logo.clearbit.com/contour-software.com', industry: 'Technology & IT' },
   { name: 'Folio3', domain: 'folio3.com', logoUrl: 'https://logo.clearbit.com/folio3.com', industry: 'Technology & IT' },
   { name: 'Motive (KeepTruckin)', domain: 'gomotive.com', logoUrl: 'https://logo.clearbit.com/gomotive.com', industry: 'Technology & IT' },
+  { name: 'Qualix Solutions', domain: 'qualix.com', logoUrl: 'https://logo.clearbit.com/qualix.com', industry: 'Technology & IT' },
   { name: 'Kured', domain: 'kured.co', logoUrl: 'https://logo.clearbit.com/kured.co', industry: 'Technology & IT' },
   { name: 'Confiz', domain: 'confiz.com', logoUrl: 'https://logo.clearbit.com/confiz.com', industry: 'Technology & IT' },
-  { name: 'Sfeir', domain: 'sfeir.com', logoUrl: 'https://logo.clearbit.com/sfeir.com', industry: 'Technology & IT' },
   { name: 'Rolustech', domain: 'rolustech.com', logoUrl: 'https://logo.clearbit.com/rolustech.com', industry: 'Technology & IT' },
   { name: 'Xavor Corporation', domain: 'xavor.com', logoUrl: 'https://logo.clearbit.com/xavor.com', industry: 'Technology & IT' },
-  { name: 'Netsol Cloud', domain: 'netsol.com', logoUrl: 'https://logo.clearbit.com/netsol.com', industry: 'Technology & IT' },
 
   // Telecom & Fintech
   { name: 'Jazz (PMCL)', domain: 'jazz.com.pk', logoUrl: 'https://logo.clearbit.com/jazz.com.pk', industry: 'Telecom & Media' },
@@ -43,7 +42,6 @@ export const RENOWNED_BRANDS: CompanyBrand[] = [
   { name: 'Faysal Bank', domain: 'faysalbank.com', logoUrl: 'https://logo.clearbit.com/faysalbank.com', industry: 'Finance & Banking' },
   { name: 'Allied Bank Limited (ABL)', domain: 'abl.com', logoUrl: 'https://logo.clearbit.com/abl.com', industry: 'Finance & Banking' },
   { name: 'Standard Chartered Pakistan', domain: 'sc.com/pk', logoUrl: 'https://logo.clearbit.com/sc.com', industry: 'Finance & Banking' },
-  { name: 'BankIslami', domain: 'bankislami.com.pk', logoUrl: 'https://logo.clearbit.com/bankislami.com.pk', industry: 'Finance & Banking' },
 
   // E-Commerce & Mobility
   { name: 'Daraz Pakistan', domain: 'daraz.pk', logoUrl: 'https://logo.clearbit.com/daraz.pk', industry: 'Marketing & Sales' },
@@ -52,7 +50,6 @@ export const RENOWNED_BRANDS: CompanyBrand[] = [
   { name: 'InDrive Pakistan', domain: 'indrive.com', logoUrl: 'https://logo.clearbit.com/indrive.com', industry: 'Technology & IT' },
   { name: 'Bykea', domain: 'bykea.com', logoUrl: 'https://logo.clearbit.com/bykea.com', industry: 'Technology & IT' },
   { name: 'Krave Mart', domain: 'kravemart.com', logoUrl: 'https://logo.clearbit.com/kravemart.com', industry: 'Marketing & Sales' },
-  { name: 'Cheetay', domain: 'cheetay.pk', logoUrl: 'https://logo.clearbit.com/cheetay.pk', industry: 'Marketing & Sales' },
   { name: 'PakWheels', domain: 'pakwheels.com', logoUrl: 'https://logo.clearbit.com/pakwheels.com', industry: 'Marketing & Sales' },
   { name: 'Zameen.com', domain: 'zameen.com', logoUrl: 'https://logo.clearbit.com/zameen.com', industry: 'Marketing & Sales' },
 
@@ -63,13 +60,6 @@ export const RENOWNED_BRANDS: CompanyBrand[] = [
   { name: 'Nestlé Pakistan', domain: 'nestle.pk', logoUrl: 'https://logo.clearbit.com/nestle.pk', industry: 'Marketing & Sales' },
   { name: 'PepsiCo Pakistan', domain: 'pepsico.com', logoUrl: 'https://logo.clearbit.com/pepsico.com', industry: 'Marketing & Sales' },
   { name: 'Coca-Cola Pakistan', domain: 'coca-cola.pk', logoUrl: 'https://logo.clearbit.com/coca-cola.com', industry: 'Marketing & Sales' },
-  { name: 'Procter & Gamble (P&G)', domain: 'pg.com', logoUrl: 'https://logo.clearbit.com/pg.com', industry: 'Marketing & Sales' },
-  { name: 'Reckitt Benckiser', domain: 'reckitt.com', logoUrl: 'https://logo.clearbit.com/reckitt.com', industry: 'Healthcare' },
-  { name: 'Indus Motor Company (Toyota)', domain: 'toyota-indus.com', logoUrl: 'https://logo.clearbit.com/toyota-indus.com', industry: 'Engineering' },
-  { name: 'Pak Suzuki Motor', domain: 'paksuzuki.com.pk', logoUrl: 'https://logo.clearbit.com/paksuzuki.com.pk', industry: 'Engineering' },
-  { name: 'K-Electric', domain: 'ke.com.pk', logoUrl: 'https://logo.clearbit.com/ke.com.pk', industry: 'Engineering' },
-  { name: 'Shell Pakistan', domain: 'shell.com.pk', logoUrl: 'https://logo.clearbit.com/shell.com', industry: 'Engineering' },
-  { name: 'PSO (Pakistan State Oil)', domain: 'psopk.com', logoUrl: 'https://logo.clearbit.com/psopk.com', industry: 'Engineering' },
 
   // Global Tech Giants
   { name: 'Google', domain: 'google.com', logoUrl: 'https://logo.clearbit.com/google.com', industry: 'Technology & IT' },
@@ -77,13 +67,19 @@ export const RENOWNED_BRANDS: CompanyBrand[] = [
   { name: 'Amazon', domain: 'amazon.com', logoUrl: 'https://logo.clearbit.com/amazon.com', industry: 'Technology & IT' },
   { name: 'Meta', domain: 'meta.com', logoUrl: 'https://logo.clearbit.com/meta.com', industry: 'Technology & IT' },
   { name: 'Apple', domain: 'apple.com', logoUrl: 'https://logo.clearbit.com/apple.com', industry: 'Technology & IT' },
-  { name: 'IBM', domain: 'ibm.com', logoUrl: 'https://logo.clearbit.com/ibm.com', industry: 'Technology & IT' },
-  { name: 'Oracle', domain: 'oracle.com', logoUrl: 'https://logo.clearbit.com/oracle.com', industry: 'Technology & IT' },
-  { name: 'SAP', domain: 'sap.com', logoUrl: 'https://logo.clearbit.com/sap.com', industry: 'Technology & IT' },
-  { name: 'Salesforce', domain: 'salesforce.com', logoUrl: 'https://logo.clearbit.com/salesforce.com', industry: 'Technology & IT' },
-  { name: 'Adobe', domain: 'adobe.com', logoUrl: 'https://logo.clearbit.com/adobe.com', industry: 'Technology & IT' },
   { name: 'Siemens', domain: 'siemens.com', logoUrl: 'https://logo.clearbit.com/siemens.com', industry: 'Engineering' },
 ]
+
+export function extractDomainFromName(companyName: string): string {
+  if (!companyName) return ''
+  const clean = companyName
+    .replace(/\b(pakistan|limited|ltd|inc|pvt|co|corp|corporation|group|llc|solutions|solution|tech|technologies)\b/gi, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w]/g, '')
+
+  return clean ? `${clean}.com` : `${companyName.toLowerCase().replace(/[^\w]/g, '')}.com`
+}
 
 export function searchBrands(query: string): CompanyBrand[] {
   if (!query.trim()) return RENOWNED_BRANDS.slice(0, 10)
@@ -97,18 +93,14 @@ export function getCompanyLogoUrl(name: string, customDomain?: string): string {
   if (!name || !name.trim()) return ''
   const trimmed = name.trim()
 
-  // Match existing known brand
+  // Match existing known brand (fuzzy or exact)
   const match = RENOWNED_BRANDS.find(
-    (b) => b.name.toLowerCase() === trimmed.toLowerCase()
+    (b) =>
+      b.name.toLowerCase().includes(trimmed.toLowerCase()) ||
+      trimmed.toLowerCase().includes(b.name.toLowerCase().split(' ')[0])
   )
   if (match) return match.logoUrl
 
-  // Derive domain from name if customDomain not given
-  let domain = customDomain || ''
-  if (!domain) {
-    const cleanName = trimmed.toLowerCase().replace(/[^\w]/g, '')
-    domain = `${cleanName}.com`
-  }
-
+  const domain = customDomain || extractDomainFromName(trimmed)
   return `https://logo.clearbit.com/${domain}`
 }

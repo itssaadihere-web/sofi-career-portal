@@ -18,47 +18,44 @@ export default function CompanyLogo({
 }: CompanyLogoProps) {
   const initialSrc = logoUrl || getCompanyLogoUrl(companyName)
   const [src, setSrc] = useState(initialSrc)
-  const [errorCount, setErrorCount] = useState(0)
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
     const resolved = logoUrl || getCompanyLogoUrl(companyName)
     setSrc(resolved)
-    setErrorCount(0)
+    setHasError(false)
   }, [logoUrl, companyName])
 
   const handleError = () => {
-    if (errorCount === 0) {
-      // Try Google Favicon CDN as secondary fallback
-      const cleanDomain = companyName.toLowerCase().replace(/[^\w]/g, '') + '.com'
-      setSrc(`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`)
-      setErrorCount(1)
-    } else {
-      // Final fallback: show clean uppercase initials
-      setErrorCount(2)
-    }
+    setHasError(true)
   }
 
-  const initials = (companyName || 'CO')
+  // Generate 2-letter uppercase initials (e.g. "Qualix Solution Pakistan" -> "QS")
+  const words = (companyName || 'Company')
     .trim()
     .split(/\s+/)
-    .map((w) => w[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase()
+    .filter((w) => !['pakistan', 'ltd', 'limited', 'inc', 'pvt'].includes(w.toLowerCase()))
+
+  const initials =
+    words.length >= 2
+      ? (words[0][0] + words[1][0]).toUpperCase()
+      : (companyName || 'CO').substring(0, 2).toUpperCase()
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-center rounded-xl bg-slate-100 border border-slate-200 font-black text-slate-800 overflow-hidden shadow-2xs ${sizeClassName} ${className}`}
+      className={`flex shrink-0 items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-1 overflow-hidden shadow-2xs ${sizeClassName} ${className}`}
     >
-      {src && errorCount < 2 ? (
+      {src && !hasError ? (
         <img
           src={src}
           alt={companyName}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain"
           onError={handleError}
         />
       ) : (
-        <span className="tracking-tighter">{initials}</span>
+        <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-blue-700 via-indigo-700 to-slate-900 text-white font-extrabold tracking-tight shadow-inner">
+          <span>{initials}</span>
+        </div>
       )}
     </div>
   )
