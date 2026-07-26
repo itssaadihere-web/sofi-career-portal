@@ -7,6 +7,7 @@ import { getClientSupabase } from '@/lib/supabase'
 import { Building2, PlusCircle, Eye, Users, Briefcase, Loader2, X, ExternalLink, Sparkles, Edit3, UserCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 import EditRecruiterProfileModal from '@/components/EditRecruiterProfileModal'
+import CompanyLogo from '@/components/CompanyLogo'
 
 export default function RecruiterDashboard() {
   const router = useRouter()
@@ -147,15 +148,11 @@ export default function RecruiterDashboard() {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <div className="flex items-center gap-4">
-          {recruiter?.company_logo_url && (
-            <div className="h-12 w-12 rounded-xl border border-slate-200 bg-white p-1 overflow-hidden shrink-0 shadow-2xs">
-              <img
-                src={recruiter.company_logo_url}
-                alt={recruiter.company_name}
-                className="h-full w-full object-cover rounded-lg"
-              />
-            </div>
-          )}
+          <CompanyLogo
+            companyName={recruiter?.company_name || 'Employer'}
+            logoUrl={recruiter?.company_logo_url}
+            sizeClassName="h-12 w-12 text-sm"
+          />
           <div>
             <h1 className="text-2xl font-black text-slate-900">{recruiter?.company_name} — Employer Dashboard</h1>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
@@ -234,9 +231,11 @@ export default function RecruiterDashboard() {
                   <tr key={j.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {j.company_logo_url && (
-                          <img src={j.company_logo_url} alt={j.company_name} className="h-7 w-7 rounded-lg border object-cover shrink-0" />
-                        )}
+                        <CompanyLogo
+                          companyName={j.company_name}
+                          logoUrl={j.company_logo_url}
+                          sizeClassName="h-8 w-8 text-xs"
+                        />
                         <div>
                           <Link href={`/jobs/${j.id}`} className="font-bold text-slate-900 hover:text-blue-600 text-sm">
                             {j.title}

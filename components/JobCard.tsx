@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import CompanyLogo from '@/components/CompanyLogo'
 import { MapPin, Bookmark, CheckCircle2, DollarSign, Clock } from 'lucide-react'
 
 export interface JobCardProps {
@@ -27,7 +28,6 @@ export interface JobCardProps {
 
 export default function JobCard({ job, isSaved = false, onToggleSave }: JobCardProps) {
   const [saved, setSaved] = useState(isSaved)
-  const [logoError, setLogoError] = useState(false)
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -63,19 +63,12 @@ export default function JobCard({ job, isSaved = false, onToggleSave }: JobCardP
       <div>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            {/* Company Logo or Fallback Initials */}
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-black text-base overflow-hidden shadow-2xs">
-              {job.company_logo_url && !logoError ? (
-                <img
-                  src={job.company_logo_url}
-                  alt={job.company_name}
-                  className="h-full w-full object-cover"
-                  onError={() => setLogoError(true)}
-                />
-              ) : (
-                (job.company_name || 'CO').substring(0, 2).toUpperCase()
-              )}
-            </div>
+            {/* Fail-safe Company Logo */}
+            <CompanyLogo
+              companyName={job.company_name}
+              logoUrl={job.company_logo_url}
+              sizeClassName="h-12 w-12 text-sm"
+            />
 
             <div>
               <Link href={`/jobs/${job.id}`} className="font-bold text-slate-900 text-lg group-hover:text-primary-950 transition-colors line-clamp-1">

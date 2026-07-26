@@ -18,6 +18,7 @@ import {
   Check,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import CompanyLogo from '@/components/CompanyLogo'
 
 export default function SingleJobPage() {
   const params = useParams()
@@ -228,13 +229,11 @@ export default function SingleJobPage() {
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200 font-black text-xl text-slate-700 overflow-hidden">
-                  {job.company_logo_url ? (
-                    <img src={job.company_logo_url} alt={job.company_name} className="h-full w-full object-cover" />
-                  ) : (
-                    job.company_name.substring(0, 2).toUpperCase()
-                  )}
-                </div>
+                <CompanyLogo
+                  companyName={job.company_name}
+                  logoUrl={job.company_logo_url || job.recruiter_profiles?.company_logo_url}
+                  sizeClassName="h-16 w-16 text-xl rounded-2xl"
+                />
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
                     {job.title}
