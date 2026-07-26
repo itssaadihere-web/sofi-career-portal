@@ -7,6 +7,7 @@ import { Building2, Sparkles, ArrowRight, ArrowLeft, Loader2, CheckCircle2, Doll
 import toast from 'react-hot-toast'
 import LinkedInJobImporter from '@/components/LinkedInJobImporter'
 import SophiJobCopilot from '@/components/SophiJobCopilot'
+import CompanyBrandAutocomplete from '@/components/CompanyBrandAutocomplete'
 
 export default function PostJobPage() {
   const router = useRouter()
@@ -18,6 +19,8 @@ export default function PostJobPage() {
   const [recruiter, setRecruiter] = useState<any>(null)
 
   // Form State
+  const [companyName, setCompanyName] = useState('')
+  const [companyLogoUrl, setCompanyLogoUrl] = useState('')
   const [title, setTitle] = useState('')
   const [department, setDepartment] = useState('')
   const [locationCity, setLocationCity] = useState('Karachi')
@@ -61,6 +64,8 @@ export default function PostJobPage() {
       }
 
       setRecruiter(recProfile)
+      setCompanyName(recProfile.company_name || '')
+      setCompanyLogoUrl(recProfile.company_logo_url || '')
       setApplicationEmail(recProfile.email)
       setLoading(false)
     }
@@ -70,6 +75,8 @@ export default function PostJobPage() {
 
   // Helper to bulk update state from LinkedIn scraper or Sophi AI
   const applyFormUpdates = (data: any) => {
+    if (data.companyName) setCompanyName(data.companyName)
+    if (data.companyLogoUrl) setCompanyLogoUrl(data.companyLogoUrl)
     if (data.title) setTitle(data.title)
     if (data.department) setDepartment(data.department)
     if (data.locationCity) setLocationCity(data.locationCity)
@@ -88,8 +95,8 @@ export default function PostJobPage() {
   }
 
   const handlePublish = async () => {
-    if (!title || !description) {
-      toast.error('Please fill in required fields: Job Title and Description')
+    if (!title || !description || !companyName) {
+      toast.error('Please fill in required fields: Company Name, Job Title and Description')
       return
     }
 
@@ -100,7 +107,8 @@ export default function PostJobPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           recruiterId: recruiter.id,
-          companyName: recruiter.company_name,
+          companyName,
+          companyLogoUrl,
           title,
           department,
           locationCity,
@@ -145,6 +153,8 @@ export default function PostJobPage() {
   }
 
   const currentJobState = {
+    companyName,
+    companyLogoUrl,
     title,
     department,
     locationCity,
@@ -169,7 +179,7 @@ export default function PostJobPage() {
         <div>
           <h1 className="text-2xl font-black text-slate-900">Post a New Job</h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Employer: <strong className="text-slate-700">{recruiter?.company_name}</strong> · Credits Remaining: <strong className="text-blue-600">{recruiter?.job_post_credits || 0}</strong>
+            Employer / Agency: <strong className="text-slate-700">{recruiter?.company_name}</strong> · <span className="text-emerald-600 font-bold">100% Free · Unlimited Job Posts</span>
           </p>
         </div>
 
@@ -193,9 +203,37 @@ export default function PostJobPage() {
           {/* STEP 1: Job Details */}
           {step === 1 && (
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-              <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 1 — Role & Location Details</h2>
+              <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Step 1 — Role & Hiring Company Details</h2>
 
               <div className="space-y-4">
+                {/* Hiring Company Selection (Multi-Company / HR Agency Support) */}
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase text-slate-700 flex items-center gap-1.5">
+                      <Building2 className="h-4 w-4 text-blue-600" />
+                      <span>Hiring Company Name & Brand Logo *</span>
+                    </label>
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      HR Agency / Multi-Client Option
+                    </span>
+                  </div>
+
+                  <CompanyBrandAutocomplete
+                    required
+                    value={companyName}
+                    logoUrl={companyLogoUrl}
+                    onChange={(name, logo) => {
+                      setCompanyName(name)
+                      setCompanyLogoUrl(logo)
+                    }}
+                    placeholder="Search client or company (e.g. Systems Ltd, Jazz, DevSinc...)"
+                  />
+
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    Defaulted to your account company (<strong className="text-slate-700">{recruiter?.company_name}</strong>). If you are posting on behalf of a client company, select or type their name above to display their logo on job listings.
+                  </p>
+                </div>
+
                 <div>
                   <label className="text-xs font-bold uppercase text-slate-600">Job Title *</label>
                   <input
@@ -325,6 +363,7 @@ export default function PostJobPage() {
                 <button
                   onClick={() => {
                     if (!title) toast.error('Job Title is required')
+                    else if (!companyName) toast.error('Company Name is required')
                     else setStep(2)
                   }}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors shadow-md"

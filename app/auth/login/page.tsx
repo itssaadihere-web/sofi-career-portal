@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import { Loader2, Mail, Lock, Sparkles, Building2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import CompanyBrandAutocomplete from '@/components/CompanyBrandAutocomplete'
 
 function LoginContent() {
   const router = useRouter()
@@ -18,6 +19,7 @@ function LoginContent() {
   const [fullName, setFullName] = useState('')
   const [isRecruiter, setIsRecruiter] = useState(false)
   const [companyName, setCompanyName] = useState('')
+  const [companyLogoUrl, setCompanyLogoUrl] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -32,10 +34,15 @@ function LoginContent() {
         router.push(redirect)
       } else {
         if (isRecruiter) {
+          if (!companyName) {
+            toast.error('Please specify your company name')
+            setLoading(false)
+            return
+          }
           const res = await fetch('/api/recruiter/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, fullName, companyName })
+            body: JSON.stringify({ email, password, fullName, companyName, companyLogoUrl })
           })
           const data = await res.json()
           if (!res.ok) throw new Error(data.error || 'Recruiter registration failed')
@@ -133,16 +140,21 @@ function LoginContent() {
               </label>
 
               {isRecruiter && (
-                <div>
-                  <label className="text-xs font-bold uppercase text-slate-600">Company Name</label>
-                  <input
-                    type="text"
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase text-slate-600">Company / Brand Name</label>
+                  <CompanyBrandAutocomplete
                     required={isRecruiter}
-                    placeholder="Acme Technologies"
                     value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    className="w-full mt-1 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:border-blue-600 focus:outline-none"
+                    logoUrl={companyLogoUrl}
+                    onChange={(name, logo) => {
+                      setCompanyName(name)
+                      setCompanyLogoUrl(logo)
+                    }}
+                    placeholder="Search company (e.g. Systems Ltd, DevSinc, Jazz...)"
                   />
+                  <p className="text-[10px] text-slate-400 font-medium pt-1">
+                    Company logo is auto-selected from renowned brand list or dynamic web favicon.
+                  </p>
                 </div>
               )}
             </div>

@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
       recruiterId,
       title,
       companyName,
+      companyLogoUrl,
       locationCity,
       locationType,
       employmentType,
@@ -36,17 +37,6 @@ export async function POST(req: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
-
-    // Check recruiter credits
-    const { data: recruiter } = await supabase
-      .from('recruiter_profiles')
-      .select('job_post_credits')
-      .eq('id', recruiterId)
-      .single()
-
-    if (!recruiter || (recruiter.job_post_credits ?? 0) <= 0) {
-      return NextResponse.json({ error: 'Insufficient job post credits. Please upgrade your plan.' }, { status: 403 })
-    }
 
     // Auto-extract top 15 ATS keywords using Kimi AI API
     let keywords: string[] = []
@@ -98,13 +88,14 @@ export async function POST(req: NextRequest) {
       )).slice(0, 15)
     }
 
-    // Insert job into database
+    // Insert job into database (100% Free Unlimited Job Postings)
     const { data: newJob, error: insertError } = await supabase
       .from('jobs')
       .insert({
         recruiter_id: recruiterId,
         title,
         company_name: companyName,
+        company_logo_url: companyLogoUrl || null,
         location_city: locationCity || 'Karachi',
         location_type: locationType || 'onsite',
         employment_type: employmentType || 'full-time',
@@ -131,12 +122,6 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (insertError) throw insertError
-
-    // Decrement recruiter job_post_credits by 1
-    await supabase
-      .from('recruiter_profiles')
-      .update({ job_post_credits: Math.max(0, (recruiter.job_post_credits || 1) - 1) })
-      .eq('id', recruiterId)
 
     return NextResponse.json({ success: true, job: newJob })
   } catch (err: any) {

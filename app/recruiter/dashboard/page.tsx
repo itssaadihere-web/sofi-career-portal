@@ -150,8 +150,8 @@ export default function RecruiterDashboard() {
         </div>
 
         <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-sm space-y-1">
-          <div className="text-xs font-extrabold uppercase text-slate-400">Credits Left</div>
-          <div className="text-2xl font-black text-emerald-600">{recruiter?.job_post_credits || 0}</div>
+          <div className="text-xs font-extrabold uppercase text-slate-400">Employer Plan</div>
+          <div className="text-xl font-black text-emerald-600">100% Free (∞)</div>
         </div>
       </div>
 

@@ -27,6 +27,7 @@ export interface JobCardProps {
 
 export default function JobCard({ job, isSaved = false, onToggleSave }: JobCardProps) {
   const [saved, setSaved] = useState(isSaved)
+  const [logoError, setLogoError] = useState(false)
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -63,11 +64,16 @@ export default function JobCard({ job, isSaved = false, onToggleSave }: JobCardP
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* Company Logo or Fallback Initials */}
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-50 border border-primary-100 text-primary-950 font-extrabold text-base overflow-hidden">
-              {job.company_logo_url ? (
-                <img src={job.company_logo_url} alt={job.company_name} className="h-full w-full object-cover" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-black text-base overflow-hidden shadow-2xs">
+              {job.company_logo_url && !logoError ? (
+                <img
+                  src={job.company_logo_url}
+                  alt={job.company_name}
+                  className="h-full w-full object-cover"
+                  onError={() => setLogoError(true)}
+                />
               ) : (
-                job.company_name.substring(0, 2).toUpperCase()
+                (job.company_name || 'CO').substring(0, 2).toUpperCase()
               )}
             </div>
 

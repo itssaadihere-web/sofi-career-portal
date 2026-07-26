@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
       password,
       fullName,
       companyName,
+      companyLogoUrl,
       companySize,
       industry,
       locationCity
@@ -34,16 +35,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: authError.message }, { status: 400 })
     }
 
-    // Insert into recruiter_profiles
+    // Insert into recruiter_profiles with unlimited free job post access
     const { error: profileError } = await supabase.from('recruiter_profiles').insert({
       id: authUser.user!.id,
       email,
       full_name: fullName,
       company_name: companyName,
+      company_logo_url: companyLogoUrl || null,
       company_size: companySize || '11-50',
       industry: industry || 'Technology',
       location_city: locationCity || 'Karachi',
-      job_post_credits: 2 // Free tier gets 2 job post credits
+      job_post_credits: 999999 // 100% Free unlimited job posts
     })
 
     if (profileError) throw profileError
