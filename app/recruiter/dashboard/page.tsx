@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getClientSupabase } from '@/lib/supabase'
-import { Building2, PlusCircle, Eye, Users, Briefcase, CreditCard, Loader2, X, ExternalLink, Sparkles } from 'lucide-react'
+import { Building2, PlusCircle, Eye, Users, Briefcase, Loader2, X, ExternalLink, Sparkles, Edit3, UserCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
+import EditRecruiterProfileModal from '@/components/EditRecruiterProfileModal'
 
 export default function RecruiterDashboard() {
   const router = useRouter()
@@ -17,6 +18,11 @@ export default function RecruiterDashboard() {
   const [selectedJob, setSelectedJob] = useState<any>(null)
   const [applicants, setApplicants] = useState<any[]>([])
   const [loadingApplicants, setLoadingApplicants] = useState(false)
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
+
+  // Metrics
+  const [discardedCount, setDiscardedCount] = useState(0)
+  const [totalApplicationsCount, setTotalApplicationsCount] = useState(0)
 
   const CV_BUILDER_URL = process.env.NEXT_PUBLIC_CV_BUILDER_URL || 'https://joinsophi.com'
 
@@ -50,7 +56,26 @@ export default function RecruiterDashboard() {
         .eq('recruiter_id', session.user.id)
         .order('created_at', { ascending: false })
 
-      if (jobList) setJobs(jobList)
+      if (jobList) {
+        setJobs(jobList)
+
+        // Fetch applications to compute total applications & discarded count
+        const jobIds = jobList.map((j) => j.id)
+        if (jobIds.length > 0) {
+          const { data: allApps } = await supabase
+            .from('job_applications')
+            .select('id, status')
+            .in('job_id', jobIds)
+
+          if (allApps) {
+            setTotalApplicationsCount(allApps.length)
+            setDiscardedCount(
+              allApps.filter((a) => a.status === 'rejected' || a.status === 'discarded').length
+            )
+          }
+        }
+      }
+
       setLoading(false)
     }
 
@@ -80,9 +105,15 @@ export default function RecruiterDashboard() {
 
       if (error) throw error
 
-      setApplicants(prev =>
-        prev.map(a => (a.id === applicationId ? { ...a, status: newStatus } : a))
+      setApplicants((prev) =>
+        prev.map((a) => (a.id === applicationId ? { ...a, status: newStatus } : a))
       )
+
+      // Re-calculate discarded count locally
+      if (newStatus === 'rejected' || newStatus === 'discarded') {
+        setDiscardedCount((prev) => prev + 1)
+      }
+
       toast.success(`Applicant status updated to ${newStatus}`)
 
       // Send notification via API
@@ -92,8 +123,8 @@ export default function RecruiterDashboard() {
         body: JSON.stringify({
           userId: applicantId,
           jobTitle: selectedJob?.title,
-          status: newStatus
-        })
+          status: newStatus,
+        }),
       }).catch(() => {})
     } catch (err: any) {
       toast.error(err.message || 'Failed to update status')
@@ -110,48 +141,72 @@ export default function RecruiterDashboard() {
   }
 
   const totalViews = jobs.reduce((sum, j) => sum + (j.views_count || 0), 0)
-  const totalApps = jobs.reduce((sum, j) => sum + (j.applications_count || 0), 0)
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900">{recruiter?.company_name} — Employer Dashboard</h1>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Recruiter: <strong className="text-slate-700">{recruiter?.full_name || recruiter?.email}</strong>
-          </p>
+        <div className="flex items-center gap-4">
+          {recruiter?.company_logo_url && (
+            <div className="h-12 w-12 rounded-xl border border-slate-200 bg-white p-1 overflow-hidden shrink-0 shadow-2xs">
+              <img
+                src={recruiter.company_logo_url}
+                alt={recruiter.company_name}
+                className="h-full w-full object-cover rounded-lg"
+              />
+            </div>
+          )}
+          <div>
+            <h1 className="text-2xl font-black text-slate-900">{recruiter?.company_name} — Employer Dashboard</h1>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Recruiter: <strong className="text-slate-700">{recruiter?.full_name || recruiter?.email}</strong>
+            </p>
+          </div>
         </div>
 
-        <Link
-          href="/recruiter/post-job"
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-all shadow-md shrink-0"
-        >
-          <PlusCircle className="h-4 w-4" />
-          <span>Post New Job</span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsEditProfileOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-bold text-xs hover:bg-slate-100 transition-all shrink-0"
+          >
+            <Edit3 className="h-4 w-4 text-slate-600" />
+            <span>Edit Profile</span>
+          </button>
+
+          <Link
+            href="/recruiter/post-job"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-all shadow-md shrink-0"
+          >
+            <PlusCircle className="h-4 w-4" />
+            <span>Post New Job</span>
+          </Link>
+        </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* 4 Requested Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* 1. Active Jobs */}
         <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-sm space-y-1">
           <div className="text-xs font-extrabold uppercase text-slate-400">Active Jobs</div>
-          <div className="text-2xl font-black text-slate-900">{jobs.filter(j => j.status === 'active').length}</div>
+          <div className="text-2xl font-black text-slate-900">{jobs.filter((j) => j.status === 'active').length}</div>
         </div>
 
-        <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-sm space-y-1">
-          <div className="text-xs font-extrabold uppercase text-slate-400">Total Applicants</div>
-          <div className="text-2xl font-black text-blue-600">{totalApps}</div>
-        </div>
-
+        {/* 2. Job Views */}
         <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-sm space-y-1">
           <div className="text-xs font-extrabold uppercase text-slate-400">Job Views</div>
           <div className="text-2xl font-black text-slate-900">{totalViews}</div>
         </div>
 
+        {/* 3. Job Applications */}
         <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-sm space-y-1">
-          <div className="text-xs font-extrabold uppercase text-slate-400">Employer Plan</div>
-          <div className="text-xl font-black text-emerald-600">100% Free (∞)</div>
+          <div className="text-xs font-extrabold uppercase text-slate-400">Job Applications</div>
+          <div className="text-2xl font-black text-blue-600">{totalApplicationsCount}</div>
+        </div>
+
+        {/* 4. Applications Discarded */}
+        <div className="rounded-2xl bg-white p-5 border border-slate-200 shadow-sm space-y-1">
+          <div className="text-xs font-extrabold uppercase text-slate-400">Applications Discarded</div>
+          <div className="text-2xl font-black text-red-600">{discardedCount}</div>
         </div>
       </div>
 
@@ -178,10 +233,17 @@ export default function RecruiterDashboard() {
                 {jobs.map((j) => (
                   <tr key={j.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
-                      <Link href={`/jobs/${j.id}`} className="font-bold text-slate-900 hover:text-blue-600 text-sm">
-                        {j.title}
-                      </Link>
-                      <div className="text-[11px] text-slate-500">{j.location_city} · {j.location_type}</div>
+                      <div className="flex items-center gap-3">
+                        {j.company_logo_url && (
+                          <img src={j.company_logo_url} alt={j.company_name} className="h-7 w-7 rounded-lg border object-cover shrink-0" />
+                        )}
+                        <div>
+                          <Link href={`/jobs/${j.id}`} className="font-bold text-slate-900 hover:text-blue-600 text-sm">
+                            {j.title}
+                          </Link>
+                          <div className="text-[11px] text-slate-500">{j.company_name} · {j.location_city}</div>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
@@ -194,12 +256,20 @@ export default function RecruiterDashboard() {
                     <td className="px-6 py-4 font-extrabold text-blue-600">{j.applications_count || 0}</td>
                     <td className="px-6 py-4 text-slate-500">{new Date(j.published_at).toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => openApplicantsPanel(j)}
-                        className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors"
-                      >
-                        View Applicants
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/recruiter/edit-job/${j.id}`}
+                          className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-colors"
+                        >
+                          Edit Job
+                        </Link>
+                        <button
+                          onClick={() => openApplicantsPanel(j)}
+                          className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors"
+                        >
+                          View Applicants
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -219,98 +289,101 @@ export default function RecruiterDashboard() {
 
       {/* Applicants Slide-in Modal */}
       {selectedJob && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-end animate-fade-in">
-          <div className="w-full max-w-2xl bg-white h-full shadow-2xl p-6 overflow-y-auto space-y-6 flex flex-col justify-between">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-blue-600">Applicants for</span>
-                  <h3 className="text-xl font-black text-slate-900">{selectedJob.title}</h3>
-                </div>
-                <button
-                  onClick={() => setSelectedJob(null)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+        <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-xs">
+          <div className="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
+            {/* Header */}
+            <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div>
+                <h3 className="font-extrabold text-slate-900 text-lg">{selectedJob.title}</h3>
+                <p className="text-xs text-slate-500 font-medium">Ranked Applicants by Sophi Kimi AI Match Score</p>
               </div>
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="p-2 rounded-xl hover:bg-slate-200 text-slate-500"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
+            {/* Content List */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-4">
               {loadingApplicants ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <div className="flex flex-col items-center justify-center py-20 text-slate-500 text-xs font-semibold">
+                  <Loader2 className="h-6 w-6 animate-spin text-blue-600 mb-2" />
+                  Fetching applicant CV profiles...
                 </div>
               ) : applicants.length > 0 ? (
-                <div className="space-y-4">
-                  {applicants.map((app) => (
-                    <div key={app.id} className="p-4 rounded-xl border border-slate-200 bg-white space-y-3 shadow-sm">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="font-bold text-slate-900 text-sm">
-                            {app.profiles?.full_name || app.profiles?.email || 'Candidate'}
-                          </div>
-                          <div className="text-xs text-slate-500">
-                            Applied: {new Date(app.applied_at).toLocaleDateString()}
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <span className="text-xl font-black text-blue-600">{app.match_score || 75}%</span>
-                          <div className="text-[9px] uppercase font-bold text-slate-400">Match Score</div>
-                        </div>
+                applicants.map((app) => (
+                  <div key={app.id} className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3 shadow-2xs">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm">
+                          {app.profiles?.full_name || app.applicant_email}
+                        </h4>
+                        <p className="text-xs text-slate-500 font-medium">{app.applicant_email} · Applied {new Date(app.created_at).toLocaleDateString()}</p>
                       </div>
 
-                      {app.cover_letter && (
-                        <div className="p-3 bg-slate-50 rounded-lg text-xs text-slate-700 line-clamp-3 italic">
-                          &quot;{app.cover_letter}&quot;
+                      {app.match_score !== undefined && (
+                        <div className="flex items-center gap-1 px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 font-black text-xs shadow-2xs">
+                          <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                          <span>{app.match_score}% AI Match</span>
                         </div>
                       )}
-
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                        <label className="font-bold text-slate-600 flex items-center gap-2">
-                          Status:
-                          <select
-                            value={app.status}
-                            onChange={(e) => handleUpdateStatus(app.id, e.target.value, app.applicant_id)}
-                            className="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 font-bold text-slate-800 focus:outline-none"
-                          >
-                            <option value="applied">Applied</option>
-                            <option value="viewed">Viewed</option>
-                            <option value="shortlisted">Shortlisted</option>
-                            <option value="interview">Interview</option>
-                            <option value="hired">Hired</option>
-                            <option value="rejected">Rejected</option>
-                          </select>
-                        </label>
-
-                        {app.cv_job_id && (
-                          <a
-                            href={`${CV_BUILDER_URL}/result/${app.cv_job_id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-bold text-blue-600 hover:underline flex items-center gap-1"
-                          >
-                            View Candidate CV <ExternalLink className="h-3 w-3" />
-                          </a>
-                        )}
-                      </div>
                     </div>
-                  ))}
-                </div>
+
+                    {app.cover_note && (
+                      <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 italic">
+                        &quot;{app.cover_note}&quot;
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                      {/* Status Selector */}
+                      <select
+                        value={app.status || 'applied'}
+                        onChange={(e) => handleUpdateStatus(app.id, e.target.value, app.user_id)}
+                        className="p-2 rounded-xl border border-slate-200 font-bold text-slate-700 bg-white focus:outline-none"
+                      >
+                        <option value="applied">Applied</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="shortlisted">Shortlisted ⭐</option>
+                        <option value="interviewed">Interviewed</option>
+                        <option value="hired">Hired 🎉</option>
+                        <option value="rejected">Discarded / Rejected ❌</option>
+                      </select>
+
+                      {app.profiles?.id && (
+                        <a
+                          href={`${CV_BUILDER_URL}/dashboard`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-blue-600 font-bold hover:underline"
+                        >
+                          <span>View Full Sophi CV</span>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))
               ) : (
-                <div className="text-center py-12 text-slate-500 text-xs font-semibold">
-                  No applicants received yet for this role.
+                <div className="text-center py-16 text-xs text-slate-500 font-medium">
+                  No candidate applications received yet for this role.
                 </div>
               )}
             </div>
-
-            <button
-              onClick={() => setSelectedJob(null)}
-              className="w-full py-3 rounded-xl bg-slate-100 font-bold text-xs text-slate-700 hover:bg-slate-200"
-            >
-              Close Panel
-            </button>
           </div>
         </div>
+      )}
+
+      {/* Edit Recruiter Profile Modal */}
+      {recruiter && (
+        <EditRecruiterProfileModal
+          recruiter={recruiter}
+          isOpen={isEditProfileOpen}
+          onClose={() => setIsEditProfileOpen(false)}
+          onSuccess={(updated) => setRecruiter(updated)}
+        />
       )}
     </div>
   )

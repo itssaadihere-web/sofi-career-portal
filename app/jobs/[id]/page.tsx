@@ -41,9 +41,13 @@ export default function SingleJobPage() {
     async function loadJobAndUser() {
       if (!jobId) return
 
-      // Increment views count silently
+      // Increment views count via API
       try {
-        await supabase.rpc('increment_job_views', { job_id_param: jobId })
+        fetch('/api/jobs/increment-view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId }),
+        }).catch(() => {})
       } catch (err) {}
 
       // Fetch job details
