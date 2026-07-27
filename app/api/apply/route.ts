@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { notify } from '@/lib/notificationEngine'
+import { calculateMatchScore } from '@/lib/matchEngine'
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,26 +33,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Job listing not found' }, { status: 404 })
     }
 
-    // Calculate keyword match score
-    let matchScore = 75
+    // Calculate keyword match score using unified engine
+    let matchScore = 0
     if (cvJobId) {
       const { data: cvJob } = await supabase
         .from('cv_jobs')
-        .select('gap_analysis, linkedin_optimizer')
+        .select('*')
         .eq('id', cvJobId)
         .single()
 
       if (cvJob) {
-        const cvKws = [
-          ...(cvJob.gap_analysis?.missingKeywords || []),
-          ...(cvJob.linkedin_optimizer?.skills || [])
-        ].map((k: string) => k.toLowerCase())
-
-        const jobKws = (job.keywords || []).map((k: string) => k.toLowerCase())
-        const matched = cvKws.filter((ck: string) =>
-          jobKws.some((jk: string) => jk.includes(ck) || ck.includes(jk))
-        )
-        matchScore = Math.min(100, Math.round((matched.length / Math.max(jobKws.length, 1)) * 100))
+        const matchResult = calculateMatchScore(job, cvJob)
+        matchScore = matchResult.score !== null ? matchResult.score : 0
       }
     }
 

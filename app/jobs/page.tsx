@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
 import { Search, Filter, RotateCcw, Briefcase, Loader2, Sparkles } from 'lucide-react'
+import { calculateMatchScore } from '@/lib/matchEngine'
 
 function JobsContent() {
   const router = useRouter()
@@ -21,8 +22,8 @@ function JobsContent() {
   const [minSalary, setMinSalary] = useState(0)
   const [sortBy, setSortBy] = useState('matched')
 
-  // User CV Keywords & Jobs data
-  const [userKeywords, setUserKeywords] = useState<string[]>([])
+  // User CV & Jobs data
+  const [latestCvJob, setLatestCvJob] = useState<any>(null)
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -46,25 +47,21 @@ function JobsContent() {
     { id: 'lead', label: 'Lead / Director' },
   ]
 
-  // Fetch logged in user's CV keywords for AI matching
+  // Fetch logged in user's latest CV created on joinsophi.com
   useEffect(() => {
     async function fetchUserCV() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         const { data: cv } = await supabase
           .from('cv_jobs')
-          .select('gap_analysis, linkedin_optimizer')
+          .select('*')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(1)
           .single()
 
         if (cv) {
-          const kws = [
-            ...(cv.gap_analysis?.missingKeywords || []),
-            ...(cv.linkedin_optimizer?.skills || []),
-          ].map((k: string) => k.toLowerCase())
-          setUserKeywords(Array.from(new Set(kws)))
+          setLatestCvJob(cv)
         }
       }
     }
@@ -122,36 +119,22 @@ function JobsContent() {
           filtered = filtered.filter((j) => expLevels.includes((j.experience_level || '').toLowerCase()))
         }
 
-        // Calculate AI Match Score for each job
-        const targetKws =
-          userKeywords.length > 0
-            ? userKeywords
-            : keyword.trim()
-            ? keyword.toLowerCase().split(/\s+/)
-            : []
-
+        // Calculate accurate match score for every job using unified match engine
         filtered = filtered.map((j) => {
-          let score = 60
-          if (targetKws.length > 0) {
-            const jobKws = (j.keywords || []).map((k: string) => k.toLowerCase())
-            const fullText = `${j.title} ${j.description} ${j.requirements}`.toLowerCase()
-
-            let matchCount = 0
-            targetKws.forEach((kw) => {
-              if (jobKws.some((jk: string) => jk.includes(kw) || kw.includes(jk)) || fullText.includes(kw)) {
-                matchCount++
-              }
-            })
-            score = Math.min(99, Math.max(35, Math.round((matchCount / Math.max(targetKws.length, 1)) * 100)))
-          } else {
-            score = Math.min(98, 70 + ((j.keywords?.length || 4) * 2))
+          const matchResult = calculateMatchScore(j, latestCvJob)
+          return {
+            ...j,
+            match_score: matchResult.score,
           }
-          return { ...j, match_score: score }
         })
 
-        // Sort by Most Matched (highest score first)
+        // Sort by Most Matched (highest match_score first)
         if (sortBy === 'matched') {
-          filtered.sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+          filtered.sort((a, b) => {
+            const scoreA = a.match_score !== null ? a.match_score : -1
+            const scoreB = b.match_score !== null ? b.match_score : -1
+            return scoreB - scoreA
+          })
         }
 
         setJobs(filtered)
@@ -173,7 +156,7 @@ function JobsContent() {
     expLevels,
     minSalary,
     sortBy,
-    userKeywords,
+    latestCvJob,
   ])
 
   const toggleLocationType = (type: string) => {
@@ -215,7 +198,7 @@ function JobsContent() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-black">Explore Jobs in Pakistan</h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-medium">
-            Discover roles matched to your Sophi ATS resume keywords. Apply with 1 click.
+            Discover roles matched directly against your latest Sophi CV created on joinsophi.com.
           </p>
         </div>
       </div>

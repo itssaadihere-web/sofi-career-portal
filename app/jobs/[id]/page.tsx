@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import CompanyLogo from '@/components/CompanyLogo'
+import { calculateMatchScore } from '@/lib/matchEngine'
 
 export default function SingleJobPage() {
   const params = useParams()
@@ -94,36 +95,24 @@ export default function SingleJobPage() {
           .single()
         if (saved) setIsSaved(true)
 
-        // Fetch user's latest Sophi CV transformation
+        // Fetch user's latest Sophi CV transformation from joinsophi.com
         const { data: latestCv } = await supabase
           .from('cv_jobs')
-          .select('gap_analysis, linkedin_optimizer')
+          .select('*')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(1)
           .single()
 
         if (latestCv) {
-          const cvKws = [
-            ...(latestCv.gap_analysis?.missingKeywords || []),
-            ...(latestCv.linkedin_optimizer?.skills || [])
-          ].map((k: string) => k.toLowerCase())
-
-          setUserCVKeywords(cvKws)
-
-          // Calculate match score
-          const jobKws = (jobData.keywords || []).map((k: string) => k.toLowerCase())
-          const matched = cvKws.filter((ck: string) =>
-            jobKws.some((jk: string) => jk.includes(ck) || ck.includes(jk))
-          )
-          const missing = jobKws.filter((jk: string) =>
-            !cvKws.some((ck: string) => jk.includes(ck) || ck.includes(jk))
-          )
-
-          const score = Math.min(100, Math.round((matched.length / Math.max(jobKws.length, 1)) * 100))
-          setMatchScore(score)
-          setMatchedKeywords(Array.from(new Set(matched)))
-          setMissingKeywords(Array.from(new Set(missing)))
+          const matchResult = calculateMatchScore(jobData, latestCv)
+          setMatchScore(matchResult.score)
+          setMatchedKeywords(matchResult.matchedKeywords)
+          setMissingKeywords(matchResult.missingKeywords)
+        } else {
+          setMatchScore(null)
+          setMatchedKeywords([])
+          setMissingKeywords(jobData.keywords || [])
         }
       }
     }
