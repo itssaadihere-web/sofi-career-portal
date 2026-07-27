@@ -150,6 +150,13 @@ export default function SingleJobPage() {
     }
   }
 
+  const handleCvClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    const { getJoinsophiCvUrl } = await import('@/lib/sso')
+    const ssoUrl = await getJoinsophiCvUrl(supabase, '/builder')
+    window.open(ssoUrl, '_blank', 'noopener,noreferrer')
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center py-20">
@@ -367,9 +374,8 @@ export default function SingleJobPage() {
                   <p className="text-xs text-slate-600">Get your CV optimized with Sophi AI first to unlock instant matching.</p>
                   <a
                     href={CV_BUILDER_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-xs font-bold text-blue-600 hover:underline"
+                    onClick={handleCvClick}
+                    className="block text-xs font-bold text-blue-600 hover:underline cursor-pointer"
                   >
                     Optimize Your CV Now →
                   </a>

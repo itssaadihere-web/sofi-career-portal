@@ -65,6 +65,19 @@ export default function Header() {
     }
   }
 
+  const handleCvClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (isRecruiter) {
+      toast.error('Recruiter profiles access the Employer Portal. Redirecting to Employer Dashboard...')
+      router.push('/recruiter/dashboard')
+      return
+    }
+
+    const { getJoinsophiCvUrl } = await import('@/lib/sso')
+    const ssoUrl = await getJoinsophiCvUrl(supabase, '/builder')
+    window.open(ssoUrl, '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -88,9 +101,8 @@ export default function Header() {
           </Link>
           <a
             href={CV_BUILDER_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-slate-700 hover:text-gold transition-colors"
+            onClick={handleCvClick}
+            className="flex items-center gap-1 text-slate-700 hover:text-gold transition-colors cursor-pointer"
           >
             <Sparkles className="h-3.5 w-3.5 text-gold-500" />
             Build/Optimize CV

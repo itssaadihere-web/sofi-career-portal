@@ -35,6 +35,19 @@ export default function SeekerDashboard() {
 
       setUser(session.user)
 
+      // Check if user is a recruiter (recruiter accounts only access career portal)
+      const { data: recruiter } = await supabase
+        .from('recruiter_profiles')
+        .select('id')
+        .eq('id', session.user.id)
+        .single()
+
+      if (recruiter) {
+        toast.error('Recruiters access the Employer Portal')
+        router.push('/recruiter/dashboard')
+        return
+      }
+
       // Fetch user profile
       const { data: prof } = await supabase
         .from('profiles')
@@ -72,6 +85,13 @@ export default function SeekerDashboard() {
 
     loadUserData()
   }, [supabase, router])
+
+  const handleCvClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    const { getJoinsophiCvUrl } = await import('@/lib/sso')
+    const ssoUrl = await getJoinsophiCvUrl(supabase, '/builder')
+    window.open(ssoUrl, '_blank', 'noopener,noreferrer')
+  }
 
   if (loading) {
     return (
@@ -257,7 +277,7 @@ export default function SeekerDashboard() {
                 <Sparkles className="h-10 w-10 text-amber-400 mx-auto" />
                 <p className="text-sm font-bold text-slate-800">No recommendations generated yet.</p>
                 <p className="text-xs text-slate-500">Transform a CV on Sophi CV Builder to automatically get AI-matched jobs!</p>
-                <a href={CV_BUILDER_URL} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 inline-block">
+                <a href={CV_BUILDER_URL} onClick={handleCvClick} className="px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 inline-block cursor-pointer">
                   Optimize CV on joinsophi.com →
                 </a>
               </div>
@@ -281,9 +301,8 @@ export default function SeekerDashboard() {
               <div className="pt-4 border-t border-slate-100">
                 <a
                   href={CV_BUILDER_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 font-bold hover:underline"
+                  onClick={handleCvClick}
+                  className="inline-flex items-center gap-2 text-blue-600 font-bold hover:underline cursor-pointer"
                 >
                   Manage your Sophi CV on joinsophi.com <ExternalLink className="h-3.5 w-3.5" />
                 </a>
