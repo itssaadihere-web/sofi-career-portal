@@ -21,6 +21,7 @@ export interface JobCardProps {
     featured?: boolean
     is_verified?: boolean
     match_score?: number
+    description?: string
   }
   isSaved?: boolean
   onToggleSave?: (jobId: string) => void
@@ -96,8 +97,15 @@ export default function JobCard({ job, isSaved = false, onToggleSave }: JobCardP
           </button>
         </div>
 
+        {/* 2-Liner Job Description Snippet */}
+        {job.description && (
+          <p className="mt-3 text-xs text-slate-600 leading-relaxed font-normal line-clamp-2 overflow-hidden text-ellipsis">
+            {job.description}
+          </p>
+        )}
+
         {/* Location & Employment Badges */}
-        <div className="flex flex-wrap items-center gap-2 mt-4 text-xs font-semibold">
+        <div className="flex flex-wrap items-center gap-2 mt-3.5 text-xs font-semibold">
           <span className="flex items-center gap-1 text-slate-600">
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
             {job.location_city || 'Pakistan'}
