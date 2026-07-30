@@ -14,6 +14,14 @@ export const metadata: Metadata = {
     template: '%s | Sophi Careers'
   },
   description: 'Find jobs that match your Sophi CV. AI-powered job matching for Pakistani professionals. Browse 500+ active jobs across Pakistan and Gulf.',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
