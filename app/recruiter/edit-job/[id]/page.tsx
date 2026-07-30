@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
-import { ArrowLeft, Save, Loader2, Building2, Trash2 } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Building2, Trash2, ShieldCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 import CompanyBrandAutocomplete from '@/components/CompanyBrandAutocomplete'
 
@@ -16,6 +16,7 @@ export default function EditJobPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [postedByRecruiterId, setPostedByRecruiterId] = useState('')
 
   // Form State
   const [companyName, setCompanyName] = useState('')
@@ -60,6 +61,7 @@ export default function EditJobPage() {
       }
 
       const j = data.job
+      setPostedByRecruiterId(j.recruiter_id || '')
       setTitle(j.title || '')
       setCompanyName(j.company_name || '')
       setCompanyLogoUrl(j.company_logo_url || '')
@@ -191,6 +193,22 @@ export default function EditJobPage() {
       </div>
 
       <form onSubmit={handleUpdate} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+        {/* Admin Poster Recruiter Info Banner */}
+        {postedByRecruiterId && (
+          <div className="p-4 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-between gap-3 text-xs font-semibold text-purple-900 shadow-2xs">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-purple-600 shrink-0" />
+              <span>Job Posted By (Recruiter ID):</span>
+              <code className="bg-purple-100 text-purple-900 px-2 py-0.5 rounded font-mono text-[11px] font-bold border border-purple-300">
+                {postedByRecruiterId}
+              </code>
+            </div>
+            <span className="text-[10px] text-purple-700 font-extrabold uppercase tracking-wider bg-purple-200/60 px-2 py-0.5 rounded-full">
+              Admin Access
+            </span>
+          </div>
+        )}
+
         {/* Company & Role Details */}
         <div className="space-y-4">
           <h2 className="text-sm font-bold uppercase text-slate-400 border-b border-slate-100 pb-2">1. Hiring Company & Role Title</h2>
