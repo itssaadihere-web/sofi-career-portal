@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
-import { Search, Filter, RotateCcw, Briefcase, Loader2, Sparkles } from 'lucide-react'
+import { Search, Filter, RotateCcw, Briefcase, Loader2, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { calculateMatchScore } from '@/lib/matchEngine'
 
 function JobsContent() {
@@ -21,6 +21,10 @@ function JobsContent() {
   const [expLevels, setExpLevels] = useState<string[]>([])
   const [minSalary, setMinSalary] = useState(0)
   const [sortBy, setSortBy] = useState('matched')
+
+  // Pagination States
+  const [pageSize, setPageSize] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1)
 
   // User CV & Jobs data
   const [latestCvJob, setLatestCvJob] = useState<any>(null)
@@ -142,6 +146,7 @@ function JobsContent() {
         setJobs([])
       }
 
+      setCurrentPage(1)
       setLoading(false)
     }
 
@@ -163,18 +168,21 @@ function JobsContent() {
     setLocationTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
+    setCurrentPage(1)
   }
 
   const toggleEmploymentType = (type: string) => {
     setEmploymentTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
+    setCurrentPage(1)
   }
 
   const toggleExpLevel = (level: string) => {
     setExpLevels((prev) =>
       prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
     )
+    setCurrentPage(1)
   }
 
   const clearFilters = () => {
@@ -186,7 +194,15 @@ function JobsContent() {
     setExpLevels([])
     setMinSalary(0)
     setSortBy('matched')
+    setCurrentPage(1)
   }
+
+  // Pagination calculation
+  const totalJobs = jobs.length
+  const totalPages = Math.ceil(totalJobs / pageSize) || 1
+  const startIdx = (currentPage - 1) * pageSize
+  const endIdx = Math.min(startIdx + pageSize, totalJobs)
+  const paginatedJobs = jobs.slice(startIdx, endIdx)
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
@@ -229,7 +245,10 @@ function JobsContent() {
                 type="text"
                 placeholder="Title, skills, company..."
                 value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
+                onChange={(e) => {
+                  setKeyword(e.target.value)
+                  setCurrentPage(1)
+                }}
                 className="w-full bg-transparent text-xs font-semibold focus:outline-none"
               />
             </div>
@@ -240,7 +259,10 @@ function JobsContent() {
             <label className="text-xs font-bold uppercase text-slate-500">City / Location</label>
             <select
               value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
+              onChange={(e) => {
+                setSelectedCity(e.target.value)
+                setCurrentPage(1)
+              }}
               className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
             >
               <option value="">All Locations</option>
@@ -318,7 +340,10 @@ function JobsContent() {
               max="500000"
               step="25000"
               value={minSalary}
-              onChange={(e) => setMinSalary(Number(e.target.value))}
+              onChange={(e) => {
+                setMinSalary(Number(e.target.value))
+                setCurrentPage(1)
+              }}
               className="w-full accent-blue-600 cursor-pointer"
             />
           </div>
@@ -326,23 +351,48 @@ function JobsContent() {
 
         {/* Main Jobs Listing Area */}
         <main className="lg:col-span-8 xl:col-span-9 space-y-6">
+          {/* Top Bar Controls */}
           <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <span className="text-xs font-extrabold text-slate-700">
-              Showing <span className="text-blue-600">{jobs.length}</span> open roles
+              Showing <span className="text-blue-600">{totalJobs > 0 ? `${startIdx + 1}–${endIdx}` : 0}</span> of <span className="text-slate-900">{totalJobs}</span> open roles
             </span>
 
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-              <span>Sort by:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl font-bold text-slate-800 focus:outline-none cursor-pointer"
-              >
-                <option value="matched">Most Matched (AI Score ✨)</option>
-                <option value="recent">Most Recent</option>
-                <option value="salary">Salary: High to Low</option>
-                <option value="applications">Most Applied</option>
-              </select>
+            <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
+              {/* Jobs Per Page Selector */}
+              <div className="flex items-center gap-1.5">
+                <span>Per page:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value))
+                    setCurrentPage(1)
+                  }}
+                  className="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl font-bold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition-colors"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={30}>30</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-1.5">
+                <span>Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => {
+                    setSortBy(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                  className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl font-bold text-slate-800 focus:outline-none cursor-pointer hover:border-blue-300 transition-colors"
+                >
+                  <option value="matched">Most Matched (AI Score ✨)</option>
+                  <option value="recent">Most Recent</option>
+                  <option value="salary">Salary: High to Low</option>
+                  <option value="applications">Most Applied</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -352,11 +402,65 @@ function JobsContent() {
                 <div key={i} className="h-36 bg-slate-100 rounded-2xl animate-pulse" />
               ))}
             </div>
-          ) : jobs.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4">
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))}
+          ) : totalJobs > 0 ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-4">
+                {paginatedJobs.map((job) => (
+                  <JobCard key={job.id} job={job} />
+                ))}
+              </div>
+
+              {/* Bottom Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                  <span className="text-xs font-bold text-slate-500">
+                    Page <strong className="text-slate-900">{currentPage}</strong> of <strong className="text-slate-900">{totalPages}</strong>
+                  </span>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() => {
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        window.scrollTo({ top: 300, behavior: 'smooth' })
+                      }}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      <span>Prev</span>
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => {
+                          setCurrentPage(pageNum)
+                          window.scrollTo({ top: 300, behavior: 'smooth' })
+                        }}
+                        className={`h-8 w-8 rounded-xl text-xs font-extrabold transition-all ${
+                          currentPage === pageNum
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+
+                    <button
+                      disabled={currentPage === totalPages}
+                      onClick={() => {
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                        window.scrollTo({ top: 300, behavior: 'smooth' })
+                      }}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center space-y-4">
