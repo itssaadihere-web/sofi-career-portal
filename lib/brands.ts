@@ -6,6 +6,61 @@ export interface CompanyBrand {
 }
 
 export const KNOWN_BRAND_MAP: Record<string, { domain: string; industry: string }> = {
+  // Education, NGOs & Non-Profits
+  'aga khan university': { domain: 'aku.edu', industry: 'Education & Healthcare' },
+  'aga khan': { domain: 'aku.edu', industry: 'Education & Healthcare' },
+  aku: { domain: 'aku.edu', industry: 'Education & Healthcare' },
+  'the citizens foundation': { domain: 'tcf.org.pk', industry: 'Education & NGO' },
+  'citizens foundation': { domain: 'tcf.org.pk', industry: 'Education & NGO' },
+  tcf: { domain: 'tcf.org.pk', industry: 'Education & NGO' },
+  minerva: { domain: 'minerva.edu', industry: 'Education' },
+  'minerva university': { domain: 'minerva.edu', industry: 'Education' },
+  'minerva project': { domain: 'minerva.edu', industry: 'Education' },
+  lums: { domain: 'lums.edu.pk', industry: 'Education' },
+  nust: { domain: 'nust.edu.pk', industry: 'Education' },
+  iba: { domain: 'iba.edu.pk', industry: 'Education' },
+  fast: { domain: 'nu.edu.pk', industry: 'Education' },
+  giki: { domain: 'giki.edu.pk', industry: 'Education' },
+
+  // FMCG, Food & Consumer Goods
+  'national foods': { domain: 'nfoods.com', industry: 'FMCG & Food' },
+  'national foods limited': { domain: 'nfoods.com', industry: 'FMCG & Food' },
+  nfoods: { domain: 'nfoods.com', industry: 'FMCG & Food' },
+  shan: { domain: 'shanfoods.com', industry: 'FMCG & Food' },
+  'shan foods': { domain: 'shanfoods.com', industry: 'FMCG & Food' },
+  tapal: { domain: 'tapaltea.com', industry: 'FMCG & Food' },
+  'tapal tea': { domain: 'tapaltea.com', industry: 'FMCG & Food' },
+  mitchells: { domain: 'mitchells.com.pk', industry: 'FMCG & Food' },
+
+  // Global Big 4 & Management Consulting
+  'mckinsey & company': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  'mckinsey and company': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  'mckinsey & co': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  mckinsey: { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  bcg: { domain: 'bcg.com', industry: 'Consulting & Strategy' },
+  'boston consulting group': { domain: 'bcg.com', industry: 'Consulting & Strategy' },
+  bain: { domain: 'bain.com', industry: 'Consulting & Strategy' },
+  ey: { domain: 'ey.com', industry: 'Finance & Banking' },
+  'ernst & young': { domain: 'ey.com', industry: 'Finance & Banking' },
+  pwc: { domain: 'pwc.com', industry: 'Finance & Banking' },
+  kpmg: { domain: 'kpmg.com', industry: 'Finance & Banking' },
+  deloitte: { domain: 'deloitte.com', industry: 'Finance & Banking' },
+
+  // Banking & Financial Multinationals & Major Banks
+  ubl: { domain: 'ubldigital.com', industry: 'Finance & Banking' },
+  'united bank': { domain: 'ubldigital.com', industry: 'Finance & Banking' },
+  'united bank limited': { domain: 'ubldigital.com', industry: 'Finance & Banking' },
+  hbl: { domain: 'hbl.com', industry: 'Finance & Banking' },
+  'habib bank': { domain: 'hbl.com', industry: 'Finance & Banking' },
+  meezan: { domain: 'meezanbank.com', industry: 'Finance & Banking' },
+  'meezan bank': { domain: 'meezanbank.com', industry: 'Finance & Banking' },
+  mcb: { domain: 'mcb.com.pk', industry: 'Finance & Banking' },
+  'bank alfalah': { domain: 'bankalfalah.com', industry: 'Finance & Banking' },
+  'faysal bank': { domain: 'faysalbank.com', industry: 'Finance & Banking' },
+  'allied bank': { domain: 'abl.com', industry: 'Finance & Banking' },
+  abl: { domain: 'abl.com', industry: 'Finance & Banking' },
+  'standard chartered': { domain: 'sc.com', industry: 'Finance & Banking' },
+
   // Global BPO, Tech & Enterprise Leaders
   ibex: { domain: 'ibex.co', industry: 'Technology & IT' },
   'ibex global': { domain: 'ibex.co', industry: 'Technology & IT' },
@@ -17,51 +72,20 @@ export const KNOWN_BRAND_MAP: Record<string, { domain: string; industry: string 
   teradata: { domain: 'teradata.com', industry: 'Technology & IT' },
   sybrid: { domain: 'sybrid.com', industry: 'Technology & IT' },
   abacus: { domain: 'abacus-global.com', industry: 'Technology & IT' },
-  'abacus consulting': { domain: 'abacus-global.com', industry: 'Technology & IT' },
 
-  // Global Big 4 & Management Consulting
-  ey: { domain: 'ey.com', industry: 'Finance & Banking' },
-  'ernst & young': { domain: 'ey.com', industry: 'Finance & Banking' },
-  pwc: { domain: 'pwc.com', industry: 'Finance & Banking' },
-  pricewaterhousecoopers: { domain: 'pwc.com', industry: 'Finance & Banking' },
-  kpmg: { domain: 'kpmg.com', industry: 'Finance & Banking' },
-  deloitte: { domain: 'deloitte.com', industry: 'Finance & Banking' },
-  'mckinsey & company': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
-  'mckinsey and company': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
-  'mckinsey & co': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
-  mckinsey: { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
-  bcg: { domain: 'bcg.com', industry: 'Consulting & Strategy' },
-  'boston consulting group': { domain: 'bcg.com', industry: 'Consulting & Strategy' },
-  bain: { domain: 'bain.com', industry: 'Consulting & Strategy' },
-  'bain & company': { domain: 'bain.com', industry: 'Consulting & Strategy' },
-
-  // Banking & Financial Multinationals & Major Banks
-  hbl: { domain: 'hbl.com', industry: 'Finance & Banking' },
-  'habib bank': { domain: 'hbl.com', industry: 'Finance & Banking' },
-  meezan: { domain: 'meezanbank.com', industry: 'Finance & Banking' },
-  ubl: { domain: 'ubldigital.com', industry: 'Finance & Banking' },
-  mcb: { domain: 'mcb.com.pk', industry: 'Finance & Banking' },
-  'bank alfalah': { domain: 'bankalfalah.com', industry: 'Finance & Banking' },
-  'faysal bank': { domain: 'faysalbank.com', industry: 'Finance & Banking' },
-  'allied bank': { domain: 'abl.com', industry: 'Finance & Banking' },
-  abl: { domain: 'abl.com', industry: 'Finance & Banking' },
-  'standard chartered': { domain: 'sc.com', industry: 'Finance & Banking' },
-
-  // Pharmaceuticals & Healthcare Multinationals
+  // Pharmaceuticals & Healthcare
   'martin dow': { domain: 'martindow.com', industry: 'Healthcare' },
   getz: { domain: 'getzpharma.com', industry: 'Healthcare' },
   'getz pharma': { domain: 'getzpharma.com', industry: 'Healthcare' },
   abbott: { domain: 'abbott.com', industry: 'Healthcare' },
   gsk: { domain: 'gsk.com', industry: 'Healthcare' },
-  glaxosmithkline: { domain: 'gsk.com', industry: 'Healthcare' },
   pfizer: { domain: 'pfizer.com', industry: 'Healthcare' },
   bayer: { domain: 'bayer.com', industry: 'Healthcare' },
-  roche: { domain: 'roche.com', industry: 'Healthcare' },
   novartis: { domain: 'novartis.com', industry: 'Healthcare' },
   sanofi: { domain: 'sanofi.com', industry: 'Healthcare' },
   searle: { domain: 'searlecompany.com', industry: 'Healthcare' },
 
-  // FMCG & Consumer Goods Multinationals
+  // FMCG Multinationals
   unilever: { domain: 'unilever.com', industry: 'Marketing & Sales' },
   nestle: { domain: 'nestle.com', industry: 'Marketing & Sales' },
   pepsi: { domain: 'pepsico.com', industry: 'Marketing & Sales' },
@@ -70,12 +94,8 @@ export const KNOWN_BRAND_MAP: Record<string, { domain: string; industry: string 
   'coca-cola': { domain: 'coca-cola.com', industry: 'Marketing & Sales' },
   'p&g': { domain: 'pg.com', industry: 'Marketing & Sales' },
   'procter & gamble': { domain: 'pg.com', industry: 'Marketing & Sales' },
-  reckitt: { domain: 'reckitt.com', industry: 'Healthcare' },
-  'loreal': { domain: 'loreal.com', industry: 'Marketing & Sales' },
-  "l'oreal": { domain: 'loreal.com', industry: 'Marketing & Sales' },
-  'johnson & johnson': { domain: 'jnj.com', industry: 'Healthcare' },
 
-  // IT, Telecom & Mobility Giants
+  // Tech Giants & Pakistani IT Leaders
   systems: { domain: 'systemsltd.com', industry: 'Technology & IT' },
   'systems limited': { domain: 'systemsltd.com', industry: 'Technology & IT' },
   netsol: { domain: 'netsoltech.com', industry: 'Technology & IT' },
@@ -92,18 +112,11 @@ export const KNOWN_BRAND_MAP: Record<string, { domain: string; industry: string 
   daraz: { domain: 'daraz.pk', industry: 'Marketing & Sales' },
   foodpanda: { domain: 'foodpanda.pk', industry: 'Marketing & Sales' },
   careem: { domain: 'careem.com', industry: 'Technology & IT' },
-  indrive: { domain: 'indrive.com', industry: 'Technology & IT' },
-  bykea: { domain: 'bykea.com', industry: 'Technology & IT' },
   google: { domain: 'google.com', industry: 'Technology & IT' },
   microsoft: { domain: 'microsoft.com', industry: 'Technology & IT' },
   amazon: { domain: 'amazon.com', industry: 'Technology & IT' },
   meta: { domain: 'meta.com', industry: 'Technology & IT' },
   apple: { domain: 'apple.com', industry: 'Technology & IT' },
-  ibm: { domain: 'ibm.com', industry: 'Technology & IT' },
-  oracle: { domain: 'oracle.com', industry: 'Technology & IT' },
-  sap: { domain: 'sap.com', industry: 'Technology & IT' },
-  siemens: { domain: 'siemens.com', industry: 'Engineering' },
-  shell: { domain: 'shell.com', industry: 'Engineering' },
 }
 
 export function getDomainForCompany(companyName: string): string {
@@ -113,10 +126,10 @@ export function getDomainForCompany(companyName: string): string {
   // Sort keys by length descending to match longer, specific brands before short acronyms
   const sortedEntries = Object.entries(KNOWN_BRAND_MAP).sort((a, b) => b[0].length - a[0].length)
 
-  // 1. Try exact or longest substring match
+  // 1. Try exact or word-boundary substring match
   for (const [key, value] of sortedEntries) {
-    if (key.length <= 3) {
-      // Use word boundary for short acronyms like "ey", "ubl", "mcb" so they don't false-match inside words like "mckinsey"
+    if (key.length <= 4) {
+      // Use word boundary for short acronyms like "ey", "ubl", "mcb", "tcf", "aku"
       const wordRegex = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
       if (wordRegex.test(lower)) {
         return value.domain
@@ -130,7 +143,7 @@ export function getDomainForCompany(companyName: string): string {
 
   // Fallback domain extraction
   const clean = lower
-    .replace(/\b(pakistan|limited|ltd|inc|pvt|co|corp|corporation|group|llc|solutions|solution|tech|technologies|global|digital)\b/gi, '')
+    .replace(/\b(pakistan|limited|ltd|inc|pvt|co|corp|corporation|group|llc|solutions|solution|tech|technologies|global|digital|the|foundation|university|school|college|hospital)\b/gi, '')
     .trim()
     .replace(/[^\w]/g, '')
 
@@ -145,7 +158,12 @@ export function getCompanyLogoUrl(companyName: string, customDomain?: string): s
 }
 
 export const RENOWNED_BRANDS: CompanyBrand[] = [
+  { name: 'Aga Khan University', domain: 'aku.edu', logoUrl: 'https://www.google.com/s2/favicons?domain=aku.edu&sz=256', industry: 'Education & Healthcare' },
+  { name: 'The Citizens Foundation', domain: 'tcf.org.pk', logoUrl: 'https://www.google.com/s2/favicons?domain=tcf.org.pk&sz=256', industry: 'Education & NGO' },
+  { name: 'National Foods Limited', domain: 'nfoods.com', logoUrl: 'https://www.google.com/s2/favicons?domain=nfoods.com&sz=256', industry: 'FMCG & Food' },
+  { name: 'Minerva University', domain: 'minerva.edu', logoUrl: 'https://www.google.com/s2/favicons?domain=minerva.edu&sz=256', industry: 'Education' },
   { name: 'McKinsey & Company', domain: 'mckinsey.com', logoUrl: 'https://www.google.com/s2/favicons?domain=mckinsey.com&sz=256', industry: 'Consulting & Strategy' },
+  { name: 'UBL (United Bank Limited)', domain: 'ubldigital.com', logoUrl: 'https://www.google.com/s2/favicons?domain=ubldigital.com&sz=256', industry: 'Finance & Banking' },
   { name: 'ibex Global', domain: 'ibex.co', logoUrl: 'https://www.google.com/s2/favicons?domain=ibex.co&sz=256', industry: 'Technology & IT' },
   { name: 'EY (Ernst & Young)', domain: 'ey.com', logoUrl: 'https://www.google.com/s2/favicons?domain=ey.com&sz=256', industry: 'Finance & Banking' },
   { name: 'HBL (Habib Bank Limited)', domain: 'hbl.com', logoUrl: 'https://www.google.com/s2/favicons?domain=hbl.com&sz=256', industry: 'Finance & Banking' },
@@ -162,7 +180,6 @@ export const RENOWNED_BRANDS: CompanyBrand[] = [
   { name: 'PepsiCo', domain: 'pepsico.com', logoUrl: 'https://www.google.com/s2/favicons?domain=pepsico.com&sz=256', industry: 'Marketing & Sales' },
   { name: 'Coca-Cola', domain: 'coca-cola.com', logoUrl: 'https://www.google.com/s2/favicons?domain=coca-cola.com&sz=256', industry: 'Marketing & Sales' },
   { name: 'Meezan Bank', domain: 'meezanbank.com', logoUrl: 'https://www.google.com/s2/favicons?domain=meezanbank.com&sz=256', industry: 'Finance & Banking' },
-  { name: 'UBL', domain: 'ubldigital.com', logoUrl: 'https://www.google.com/s2/favicons?domain=ubldigital.com&sz=256', industry: 'Finance & Banking' },
   { name: 'MCB Bank', domain: 'mcb.com.pk', logoUrl: 'https://www.google.com/s2/favicons?domain=mcb.com.pk&sz=256', industry: 'Finance & Banking' },
   { name: 'Bank Alfalah', domain: 'bankalfalah.com', logoUrl: 'https://www.google.com/s2/favicons?domain=bankalfalah.com&sz=256', industry: 'Finance & Banking' },
   { name: 'Standard Chartered', domain: 'sc.com', logoUrl: 'https://www.google.com/s2/favicons?domain=sc.com&sz=256', industry: 'Finance & Banking' },
@@ -182,8 +199,6 @@ export const RENOWNED_BRANDS: CompanyBrand[] = [
   { name: 'Google', domain: 'google.com', logoUrl: 'https://www.google.com/s2/favicons?domain=google.com&sz=256', industry: 'Technology & IT' },
   { name: 'Microsoft', domain: 'microsoft.com', logoUrl: 'https://www.google.com/s2/favicons?domain=microsoft.com&sz=256', industry: 'Technology & IT' },
   { name: 'Amazon', domain: 'amazon.com', logoUrl: 'https://www.google.com/s2/favicons?domain=amazon.com&sz=256', industry: 'Technology & IT' },
-  { name: 'Siemens', domain: 'siemens.com', logoUrl: 'https://www.google.com/s2/favicons?domain=siemens.com&sz=256', industry: 'Engineering' },
-  { name: 'Shell', domain: 'shell.com', logoUrl: 'https://www.google.com/s2/favicons?domain=shell.com&sz=256', industry: 'Engineering' },
 ]
 
 export function searchBrands(query: string): CompanyBrand[] {
@@ -193,4 +208,3 @@ export function searchBrands(query: string): CompanyBrand[] {
     (b) => b.name.toLowerCase().includes(q) || b.domain.toLowerCase().includes(q)
   ).slice(0, 10)
 }
-
