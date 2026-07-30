@@ -42,7 +42,7 @@ export default function SophiJobCopilot({ currentJobData, onUpdateForm }: SophiJ
   const [isRecording, setIsRecording] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
 
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
 
   // Initialize Web Speech Recognition if available
@@ -83,7 +83,9 @@ export default function SophiJobCopilot({ currentJobData, onUpdateForm }: SophiJ
   }, [])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (chatContainerRef.current && (messages.length > 1 || loading)) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+    }
   }, [messages, loading])
 
   const toggleRecording = () => {
@@ -228,7 +230,7 @@ export default function SophiJobCopilot({ currentJobData, onUpdateForm }: SophiJ
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4 bg-slate-50/50">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -282,8 +284,6 @@ export default function SophiJobCopilot({ currentJobData, onUpdateForm }: SophiJ
             <span>Sophi is thinking & auto-filling form...</span>
           </div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Voice Note & Text Input Area */}

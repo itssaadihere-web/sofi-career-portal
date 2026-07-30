@@ -26,8 +26,14 @@ export const KNOWN_BRAND_MAP: Record<string, { domain: string; industry: string 
   pricewaterhousecoopers: { domain: 'pwc.com', industry: 'Finance & Banking' },
   kpmg: { domain: 'kpmg.com', industry: 'Finance & Banking' },
   deloitte: { domain: 'deloitte.com', industry: 'Finance & Banking' },
-  mckinsey: { domain: 'mckinsey.com', industry: 'Finance & Banking' },
-  bcg: { domain: 'bcg.com', industry: 'Finance & Banking' },
+  'mckinsey & company': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  'mckinsey and company': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  'mckinsey & co': { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  mckinsey: { domain: 'mckinsey.com', industry: 'Consulting & Strategy' },
+  bcg: { domain: 'bcg.com', industry: 'Consulting & Strategy' },
+  'boston consulting group': { domain: 'bcg.com', industry: 'Consulting & Strategy' },
+  bain: { domain: 'bain.com', industry: 'Consulting & Strategy' },
+  'bain & company': { domain: 'bain.com', industry: 'Consulting & Strategy' },
 
   // Banking & Financial Multinationals & Major Banks
   hbl: { domain: 'hbl.com', industry: 'Finance & Banking' },
@@ -104,10 +110,21 @@ export function getDomainForCompany(companyName: string): string {
   if (!companyName) return ''
   const lower = companyName.toLowerCase().trim()
 
-  // Match known dictionary
-  for (const [key, value] of Object.entries(KNOWN_BRAND_MAP)) {
-    if (lower.includes(key) || key.includes(lower)) {
-      return value.domain
+  // Sort keys by length descending to match longer, specific brands before short acronyms
+  const sortedEntries = Object.entries(KNOWN_BRAND_MAP).sort((a, b) => b[0].length - a[0].length)
+
+  // 1. Try exact or longest substring match
+  for (const [key, value] of sortedEntries) {
+    if (key.length <= 3) {
+      // Use word boundary for short acronyms like "ey", "ubl", "mcb" so they don't false-match inside words like "mckinsey"
+      const wordRegex = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+      if (wordRegex.test(lower)) {
+        return value.domain
+      }
+    } else {
+      if (lower.includes(key) || key.includes(lower)) {
+        return value.domain
+      }
     }
   }
 
@@ -128,6 +145,7 @@ export function getCompanyLogoUrl(companyName: string, customDomain?: string): s
 }
 
 export const RENOWNED_BRANDS: CompanyBrand[] = [
+  { name: 'McKinsey & Company', domain: 'mckinsey.com', logoUrl: 'https://www.google.com/s2/favicons?domain=mckinsey.com&sz=256', industry: 'Consulting & Strategy' },
   { name: 'ibex Global', domain: 'ibex.co', logoUrl: 'https://www.google.com/s2/favicons?domain=ibex.co&sz=256', industry: 'Technology & IT' },
   { name: 'EY (Ernst & Young)', domain: 'ey.com', logoUrl: 'https://www.google.com/s2/favicons?domain=ey.com&sz=256', industry: 'Finance & Banking' },
   { name: 'HBL (Habib Bank Limited)', domain: 'hbl.com', logoUrl: 'https://www.google.com/s2/favicons?domain=hbl.com&sz=256', industry: 'Finance & Banking' },
@@ -175,3 +193,4 @@ export function searchBrands(query: string): CompanyBrand[] {
     (b) => b.name.toLowerCase().includes(q) || b.domain.toLowerCase().includes(q)
   ).slice(0, 10)
 }
+

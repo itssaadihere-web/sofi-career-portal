@@ -73,6 +73,12 @@ export default function PostJobPage() {
     checkRecruiter()
   }, [supabase, router])
 
+  useEffect(() => {
+    if (!loading) {
+      window.scrollTo(0, 0)
+    }
+  }, [loading])
+
   // Helper to bulk update state from LinkedIn scraper or Sophi AI
   const applyFormUpdates = (data: any) => {
     if (data.companyName) setCompanyName(data.companyName)
