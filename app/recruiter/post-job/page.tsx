@@ -17,8 +17,9 @@ export default function PostJobPage() {
   const [loading, setLoading] = useState(true)
   const [publishing, setPublishing] = useState(false)
   const [recruiter, setRecruiter] = useState<any>(null)
+  const [companyError, setCompanyError] = useState(false)
 
-  // Form State
+  // Form State (companyName starts completely BLANK by default)
   const [companyName, setCompanyName] = useState('')
   const [companyLogoUrl, setCompanyLogoUrl] = useState('')
   const [title, setTitle] = useState('')
@@ -64,8 +65,9 @@ export default function PostJobPage() {
       }
 
       setRecruiter(recProfile)
-      setCompanyName(recProfile.company_name || '')
-      setCompanyLogoUrl(recProfile.company_logo_url || '')
+      // Keep companyName and logo completely BLANK by default so recruiter must explicitly enter company
+      setCompanyName('')
+      setCompanyLogoUrl('')
       setApplicationEmail(recProfile.email)
       setLoading(false)
     }
@@ -101,8 +103,14 @@ export default function PostJobPage() {
   }
 
   const handlePublish = async () => {
-    if (!title || !description || !companyName) {
-      toast.error('Please fill in required fields: Company Name, Job Title and Description')
+    if (!companyName || !companyName.trim()) {
+      setCompanyError(true)
+      setStep(1)
+      toast.error('Company Name is required! Please enter the company name for this job post.')
+      return
+    }
+    if (!title || !description) {
+      toast.error('Please fill in required fields: Job Title and Description')
       return
     }
 
@@ -213,14 +221,14 @@ export default function PostJobPage() {
 
               <div className="space-y-4">
                 {/* Hiring Company Selection (Multi-Company / HR Agency Support) */}
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className={`p-4 rounded-xl border transition-all space-y-2 ${companyError ? 'bg-rose-50/70 border-rose-400 ring-2 ring-rose-200' : 'bg-slate-50 border-slate-200'}`}>
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold uppercase text-slate-700 flex items-center gap-1.5">
+                    <label className="text-xs font-bold uppercase text-slate-800 flex items-center gap-1.5">
                       <Building2 className="h-4 w-4 text-blue-600" />
-                      <span>Hiring Company Name & Brand Logo *</span>
+                      <span>Hiring Company Name & Brand Logo <span className="text-rose-600 font-extrabold">* (Required / Mandatory)</span></span>
                     </label>
-                    <span className="text-[10px] font-semibold text-slate-500">
-                      HR Agency / Multi-Client Option
+                    <span className="text-[10px] font-extrabold text-rose-600 bg-rose-100/80 px-2 py-0.5 rounded-md border border-rose-200">
+                      Required Field
                     </span>
                   </div>
 
@@ -231,13 +239,20 @@ export default function PostJobPage() {
                     onChange={(name, logo) => {
                       setCompanyName(name)
                       setCompanyLogoUrl(logo)
+                      if (name.trim()) setCompanyError(false)
                     }}
-                    placeholder="Search client or company (e.g. Systems Ltd, Jazz, DevSinc...)"
+                    placeholder="Search or type company name (e.g. Systems Ltd, HBL, Jazz, DevSinc...)"
                   />
 
-                  <p className="text-[11px] text-slate-500 font-medium">
-                    Defaulted to your account company (<strong className="text-slate-700">{recruiter?.company_name}</strong>). If you are posting on behalf of a client company, select or type their name above to display their logo on job listings.
-                  </p>
+                  {companyError ? (
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 pt-1">
+                      <span>⚠️ Please enter the company name. AAP KIS COMPANY KI JOB POST KAR RAHE HAIN? (Company field cannot be left blank).</span>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      Mandatory: Please type or select the company name for this job post. Auto-fill has been disabled so HR agencies posting for multiple clients do not accidentally post under the wrong company name.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -368,9 +383,15 @@ export default function PostJobPage() {
               <div className="flex justify-end pt-4">
                 <button
                   onClick={() => {
-                    if (!title) toast.error('Job Title is required')
-                    else if (!companyName) toast.error('Company Name is required')
-                    else setStep(2)
+                    if (!companyName || !companyName.trim()) {
+                      setCompanyError(true)
+                      toast.error('Company Name is required! Aap kis company ki job post kar rahe hain?')
+                    } else if (!title || !title.trim()) {
+                      toast.error('Job Title is required!')
+                    } else {
+                      setCompanyError(false)
+                      setStep(2)
+                    }
                   }}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors shadow-md"
                 >
