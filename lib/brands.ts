@@ -5,7 +5,28 @@ export interface CompanyBrand {
   industry: string
 }
 
+export const EXACT_BRAND_LOGO_MAP: Record<string, string> = {
+  'ke.com.pk': 'https://ke.com.pk/wp-content/uploads/2025/05/kelogo.png',
+  'k-electric.com.pk': 'https://ke.com.pk/wp-content/uploads/2025/05/kelogo.png',
+  'ubldigital.com': 'https://www.ubldigital.com/Portals/_default/skins/ubldigital/NewHome/imgs/rda-new-banner/rda-new-logo.png',
+  'ubl.com.pk': 'https://www.ubldigital.com/Portals/_default/skins/ubldigital/NewHome/imgs/rda-new-banner/rda-new-logo.png',
+  'parco.com.pk': 'https://www.parco.com.pk/wp-content/uploads/2023/07/Logo-1.png',
+  'disrupt.com': 'https://www.disrupt.com/favicon.png',
+}
+
 export const KNOWN_BRAND_MAP: Record<string, { domain: string; industry: string }> = {
+  // Energy, Utilities & Oil & Gas
+  'k electric': { domain: 'ke.com.pk', industry: 'Utilities & Energy' },
+  'k-electric': { domain: 'ke.com.pk', industry: 'Utilities & Energy' },
+  ke: { domain: 'ke.com.pk', industry: 'Utilities & Energy' },
+  parco: { domain: 'parco.com.pk', industry: 'Energy & Petroleum' },
+  'pak-arab refinery': { domain: 'parco.com.pk', industry: 'Energy & Petroleum' },
+  'pak arab refinery': { domain: 'parco.com.pk', industry: 'Energy & Petroleum' },
+
+  // Disrupt & Tech Companies
+  'disrupt.com': { domain: 'disrupt.com', industry: 'Technology & IT' },
+  disrupt: { domain: 'disrupt.com', industry: 'Technology & IT' },
+
   // Education, NGOs & Non-Profits
   'aga khan university': { domain: 'aku.edu', industry: 'Education & Healthcare' },
   'aga khan': { domain: 'aku.edu', industry: 'Education & Healthcare' },
@@ -129,7 +150,7 @@ export function getDomainForCompany(companyName: string): string {
   // 1. Try exact or word-boundary substring match
   for (const [key, value] of sortedEntries) {
     if (key.length <= 4) {
-      // Use word boundary for short acronyms like "ey", "ubl", "mcb", "tcf", "aku"
+      // Use word boundary for short acronyms like "ey", "ubl", "mcb", "tcf", "aku", "ke"
       const wordRegex = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
       if (wordRegex.test(lower)) {
         return value.domain
@@ -153,17 +174,22 @@ export function getDomainForCompany(companyName: string): string {
 export function getCompanyLogoUrl(companyName: string, customDomain?: string): string {
   if (!companyName || !companyName.trim()) return ''
   const domain = customDomain || getDomainForCompany(companyName)
-  // Use Google 256px high-res favicon API as primary high-reliability CDN
+  if (EXACT_BRAND_LOGO_MAP[domain]) {
+    return EXACT_BRAND_LOGO_MAP[domain]
+  }
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`
 }
 
 export const RENOWNED_BRANDS: CompanyBrand[] = [
+  { name: 'K-Electric', domain: 'ke.com.pk', logoUrl: 'https://ke.com.pk/wp-content/uploads/2025/05/kelogo.png', industry: 'Utilities & Energy' },
+  { name: 'UBL (United Bank Limited)', domain: 'ubldigital.com', logoUrl: 'https://www.ubldigital.com/Portals/_default/skins/ubldigital/NewHome/imgs/rda-new-banner/rda-new-logo.png', industry: 'Finance & Banking' },
+  { name: 'PARCO (Pak-Arab Refinery)', domain: 'parco.com.pk', logoUrl: 'https://www.parco.com.pk/wp-content/uploads/2023/07/Logo-1.png', industry: 'Energy & Petroleum' },
+  { name: 'Disrupt.com', domain: 'disrupt.com', logoUrl: 'https://www.disrupt.com/favicon.png', industry: 'Technology & IT' },
   { name: 'Aga Khan University', domain: 'aku.edu', logoUrl: 'https://www.google.com/s2/favicons?domain=aku.edu&sz=256', industry: 'Education & Healthcare' },
   { name: 'The Citizens Foundation', domain: 'tcf.org.pk', logoUrl: 'https://www.google.com/s2/favicons?domain=tcf.org.pk&sz=256', industry: 'Education & NGO' },
   { name: 'National Foods Limited', domain: 'nfoods.com', logoUrl: 'https://www.google.com/s2/favicons?domain=nfoods.com&sz=256', industry: 'FMCG & Food' },
   { name: 'Minerva University', domain: 'minerva.edu', logoUrl: 'https://www.google.com/s2/favicons?domain=minerva.edu&sz=256', industry: 'Education' },
   { name: 'McKinsey & Company', domain: 'mckinsey.com', logoUrl: 'https://www.google.com/s2/favicons?domain=mckinsey.com&sz=256', industry: 'Consulting & Strategy' },
-  { name: 'UBL (United Bank Limited)', domain: 'ubldigital.com', logoUrl: 'https://www.google.com/s2/favicons?domain=ubldigital.com&sz=256', industry: 'Finance & Banking' },
   { name: 'ibex Global', domain: 'ibex.co', logoUrl: 'https://www.google.com/s2/favicons?domain=ibex.co&sz=256', industry: 'Technology & IT' },
   { name: 'EY (Ernst & Young)', domain: 'ey.com', logoUrl: 'https://www.google.com/s2/favicons?domain=ey.com&sz=256', industry: 'Finance & Banking' },
   { name: 'HBL (Habib Bank Limited)', domain: 'hbl.com', logoUrl: 'https://www.google.com/s2/favicons?domain=hbl.com&sz=256', industry: 'Finance & Banking' },
@@ -208,3 +234,4 @@ export function searchBrands(query: string): CompanyBrand[] {
     (b) => b.name.toLowerCase().includes(q) || b.domain.toLowerCase().includes(q)
   ).slice(0, 10)
 }
+
