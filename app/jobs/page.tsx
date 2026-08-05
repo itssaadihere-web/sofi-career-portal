@@ -7,6 +7,19 @@ import JobCard from '@/components/JobCard'
 import { Search, Filter, RotateCcw, Briefcase, Loader2, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { calculateMatchScore } from '@/lib/matchEngine'
 
+function getPaginationRange(current: number, total: number) {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1)
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total]
+  }
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total]
+  }
+  return [1, '...', current - 1, current, current + 1, '...', total]
+}
+
 function JobsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -412,12 +425,12 @@ function JobsContent() {
 
               {/* Bottom Pagination Controls */}
               {totalPages > 1 && (
-                <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm max-w-full overflow-hidden">
                   <span className="text-xs font-bold text-slate-500">
                     Page <strong className="text-slate-900">{currentPage}</strong> of <strong className="text-slate-900">{totalPages}</strong>
                   </span>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5 max-w-full">
                     <button
                       disabled={currentPage === 1}
                       onClick={() => {
@@ -430,22 +443,28 @@ function JobsContent() {
                       <span>Prev</span>
                     </button>
 
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                      <button
-                        key={pageNum}
-                        onClick={() => {
-                          setCurrentPage(pageNum)
-                          window.scrollTo({ top: 300, behavior: 'smooth' })
-                        }}
-                        className={`h-8 w-8 rounded-xl text-xs font-extrabold transition-all ${
-                          currentPage === pageNum
-                            ? 'bg-blue-600 text-white shadow-md'
-                            : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
+                    {getPaginationRange(currentPage, totalPages).map((item, idx) =>
+                      item === '...' ? (
+                        <span key={`ellipsis-${idx}`} className="px-2 text-xs font-extrabold text-slate-400 select-none">
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={`page-${item}`}
+                          onClick={() => {
+                            setCurrentPage(Number(item))
+                            window.scrollTo({ top: 300, behavior: 'smooth' })
+                          }}
+                          className={`h-8 w-8 rounded-xl text-xs font-extrabold transition-all ${
+                            currentPage === item
+                              ? 'bg-blue-600 text-white shadow-md'
+                              : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          {item}
+                        </button>
+                      )
+                    )}
 
                     <button
                       disabled={currentPage === totalPages}
