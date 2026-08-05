@@ -15,16 +15,17 @@ export default function Homepage() {
   const [city, setCity] = useState('')
   const [featuredJobs, setFeaturedJobs] = useState<any[]>([])
   const [stats, setStats] = useState({
-    activeJobs: 120,
-    companies: 45,
-    professionals: 3500,
-    cvsOptimized: 4800,
+    activeJobs: 0,
+    companies: 0,
+    professionals: 0,
+    cvsOptimized: 0,
   })
 
   const CV_BUILDER_URL = process.env.NEXT_PUBLIC_CV_BUILDER_URL || 'https://joinsophi.com'
 
   useEffect(() => {
     async function loadData() {
+      // 1. Featured Jobs
       const { data: jobs } = await supabase
         .from('jobs')
         .select('*')
@@ -35,17 +36,50 @@ export default function Homepage() {
 
       if (jobs) setFeaturedJobs(jobs)
 
+      // 2. Live Active Jobs Count
       const { count: jobCount } = await supabase
         .from('jobs')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active')
 
-      const { count: companyCount } = await supabase
+      // 3. Live Companies Hiring Count (registered recruiters + unique companies in active jobs)
+      const { count: recCompanyCount } = await supabase
         .from('recruiter_profiles')
         .select('*', { count: 'exact', head: true })
 
-      if (jobCount) setStats(prev => ({ ...prev, activeJobs: jobCount }))
-      if (companyCount) setStats(prev => ({ ...prev, companies: companyCount }))
+      const { data: activeJobCompanies } = await supabase
+        .from('jobs')
+        .select('company_name')
+        .eq('status', 'active')
+
+      const uniqueJobCompanies = new Set(
+        (activeJobCompanies || []).map((j) => j.company_name?.toLowerCase().trim()).filter(Boolean)
+      ).size
+
+      const totalCompanies = Math.max(recCompanyCount || 0, uniqueJobCompanies)
+
+      // 4. Live Professionals Matched Count (total job applications + registered candidates)
+      const { count: appsCount } = await supabase
+        .from('job_applications')
+        .select('*', { count: 'exact', head: true })
+
+      const { count: seekerCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+
+      const totalProfessionals = (appsCount || 0) + (seekerCount || 0)
+
+      // 5. Live CVs Optimized via Sophi Count (total records in cv_jobs table)
+      const { count: cvJobsCount } = await supabase
+        .from('cv_jobs')
+        .select('*', { count: 'exact', head: true })
+
+      setStats({
+        activeJobs: jobCount || 0,
+        companies: totalCompanies || 0,
+        professionals: totalProfessionals || 0,
+        cvsOptimized: cvJobsCount || 0,
+      })
     }
 
     loadData()
@@ -150,11 +184,11 @@ export default function Homepage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 rounded-2xl bg-white p-6 shadow-sm border border-slate-200 text-center">
           <div>
-            <div className="text-3xl font-black text-primary-950">{stats.activeJobs}+</div>
+            <div className="text-3xl font-black text-primary-950">{stats.activeJobs.toLocaleString()}+</div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Active Jobs</div>
           </div>
           <div>
-            <div className="text-3xl font-black text-primary-950">{stats.companies}+</div>
+            <div className="text-3xl font-black text-primary-950">{stats.companies.toLocaleString()}+</div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Companies Hiring</div>
           </div>
           <div>
