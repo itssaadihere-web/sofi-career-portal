@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import CompanyLogo from '@/components/CompanyLogo'
 import { MapPin, Bookmark, CheckCircle2, DollarSign, Clock } from 'lucide-react'
+import { formatTimeAgo } from '@/lib/dateUtils'
 
 export interface JobCardProps {
   job: {
@@ -132,9 +133,9 @@ export default function JobCard({ job, isSaved = false, onToggleSave }: JobCardP
 
       {/* Footer bar of Card */}
       <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-100 text-xs">
-        <span className="flex items-center gap-1 text-slate-400 font-medium">
-          <Clock className="h-3.5 w-3.5" />
-          {daysAgo === 0 ? 'Posted today' : `${daysAgo}d ago`}
+        <span className="flex items-center gap-1 text-slate-500 font-semibold">
+          <Clock className="h-3.5 w-3.5 text-slate-400" />
+          <span>{formatTimeAgo(job.published_at)}</span>
         </span>
 
         <div className="flex items-center gap-3">

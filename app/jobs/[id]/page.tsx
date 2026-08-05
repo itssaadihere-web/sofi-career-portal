@@ -18,10 +18,12 @@ import {
   Check,
   Eye,
   Users,
+  Clock,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import CompanyLogo from '@/components/CompanyLogo'
 import { calculateMatchScore } from '@/lib/matchEngine'
+import { formatTimeAgo } from '@/lib/dateUtils'
 
 export default function SingleJobPage() {
   const params = useParams()
@@ -271,6 +273,10 @@ export default function SingleJobPage() {
               <span className="flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
                 <Users className="h-3.5 w-3.5 text-emerald-600" />
                 <span>{job.applications_count || 0} Applied</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-amber-700 font-bold bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                <Clock className="h-3.5 w-3.5 text-amber-600" />
+                <span>{formatTimeAgo(job.published_at)}</span>
               </span>
             </div>
           </div>

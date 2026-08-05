@@ -8,6 +8,7 @@ import { Building2, PlusCircle, Eye, Users, Briefcase, Loader2, X, ExternalLink,
 import toast from 'react-hot-toast'
 import EditRecruiterProfileModal from '@/components/EditRecruiterProfileModal'
 import CompanyLogo from '@/components/CompanyLogo'
+import { formatTimeAgo } from '@/lib/dateUtils'
 
 export default function RecruiterDashboard() {
   const router = useRouter()
@@ -300,7 +301,7 @@ export default function RecruiterDashboard() {
                     </td>
                     <td className="px-6 py-4 font-extrabold text-slate-900">{j.views_count || 0}</td>
                     <td className="px-6 py-4 font-extrabold text-blue-600">{j.applications_count || 0}</td>
-                    <td className="px-6 py-4 text-slate-500">{new Date(j.published_at).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 font-semibold text-slate-600">{formatTimeAgo(j.published_at)}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link
