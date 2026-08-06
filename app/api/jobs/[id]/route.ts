@@ -49,6 +49,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       requirements,
       responsibilities,
       benefits,
+      applicationEmail,
+      applicationUrl,
+      applyViaSophi,
+      keywords,
       status,
     } = body
 
@@ -76,6 +80,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (requirements !== undefined) updatePayload.requirements = requirements
     if (responsibilities !== undefined) updatePayload.responsibilities = responsibilities
     if (benefits !== undefined) updatePayload.benefits = benefits
+    if (applicationEmail !== undefined) updatePayload.application_email = applicationEmail || null
+    if (applicationUrl !== undefined) updatePayload.application_url = applicationUrl || null
+    if (applyViaSophi !== undefined) updatePayload.apply_via_sophi = applyViaSophi
+    if (keywords !== undefined) updatePayload.keywords = keywords
     if (status !== undefined) updatePayload.status = status
 
     const { data: updatedJob, error } = await supabase

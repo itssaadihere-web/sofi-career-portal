@@ -10,6 +10,14 @@ export function extractCvKeywords(cvJob: any): string[] {
 
   const set = new Set<string>()
 
+  // Handle direct string input (e.g. text extracted from uploaded file)
+  if (typeof cvJob === 'string') {
+    cvJob.toLowerCase().split(/[,\/\s\n\t•\-]+/).forEach((w: string) => {
+      if (w.length > 2) set.add(w.trim())
+    })
+    return Array.from(set).filter((k) => k.length >= 2)
+  }
+
   // 1. Extract from gap_analysis
   if (cvJob.gap_analysis) {
     const ga = cvJob.gap_analysis
@@ -60,8 +68,8 @@ export function extractCvKeywords(cvJob: any): string[] {
   }
 
   // 4. Raw text fallback
-  if (cvJob.resume_text || cvJob.parsed_resume) {
-    const raw = (cvJob.resume_text || JSON.stringify(cvJob.parsed_resume)).toLowerCase()
+  if (cvJob.raw_text || cvJob.resume_text || cvJob.parsed_resume) {
+    const raw = (cvJob.raw_text || cvJob.resume_text || JSON.stringify(cvJob.parsed_resume)).toLowerCase()
     raw.split(/[,\/\s\n]+/).forEach((w: string) => {
       if (w.length > 3) set.add(w.trim())
     })
