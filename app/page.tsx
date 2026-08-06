@@ -7,6 +7,42 @@ import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
 import { Search, MapPin, Sparkles, Building2, Briefcase, ArrowRight } from 'lucide-react'
 
+function AnimatedCounter({ end, duration = 2200 }: { end: number; duration?: number }) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (end <= 0) {
+      setCount(0)
+      return
+    }
+
+    let startTimestamp: number | null = null
+    let animationFrameId: number
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1)
+      
+      // Smooth easeOutExpo curve for premium counting animation
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
+      
+      const currentCount = Math.floor(easeProgress * end)
+      setCount(currentCount)
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(step)
+      } else {
+        setCount(end)
+      }
+    }
+
+    animationFrameId = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(animationFrameId)
+  }, [end, duration])
+
+  return <span>{count.toLocaleString()}+</span>
+}
+
 export default function Homepage() {
   const router = useRouter()
   const supabase = getClientSupabase()
@@ -184,19 +220,27 @@ export default function Homepage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 rounded-2xl bg-white p-6 shadow-sm border border-slate-200 text-center">
           <div>
-            <div className="text-3xl font-black text-primary-950">{stats.activeJobs.toLocaleString()}+</div>
+            <div className="text-3xl font-black text-primary-950">
+              <AnimatedCounter end={stats.activeJobs} />
+            </div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Active Jobs</div>
           </div>
           <div>
-            <div className="text-3xl font-black text-primary-950">{stats.companies.toLocaleString()}+</div>
+            <div className="text-3xl font-black text-primary-950">
+              <AnimatedCounter end={stats.companies} />
+            </div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Companies Hiring</div>
           </div>
           <div>
-            <div className="text-3xl font-black text-gold-600">{stats.professionals.toLocaleString()}+</div>
+            <div className="text-3xl font-black text-gold-600">
+              <AnimatedCounter end={stats.professionals} />
+            </div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">Professionals Matched</div>
           </div>
           <div>
-            <div className="text-3xl font-black text-primary-950">{stats.cvsOptimized.toLocaleString()}+</div>
+            <div className="text-3xl font-black text-primary-950">
+              <AnimatedCounter end={stats.cvsOptimized} />
+            </div>
             <div className="text-xs font-bold text-slate-500 uppercase mt-1">CVs Optimized via Sophi</div>
           </div>
         </div>
