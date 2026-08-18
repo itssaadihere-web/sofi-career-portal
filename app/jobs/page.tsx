@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
+import GoogleAd from '@/components/GoogleAd'
 import { Search, Filter, RotateCcw, Briefcase, Loader2, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { calculateMatchScore } from '@/lib/matchEngine'
 
@@ -360,10 +361,18 @@ function JobsContent() {
               className="w-full accent-blue-600 cursor-pointer"
             />
           </div>
+
+          {/* Sidebar Google Ad */}
+          <div className="pt-2">
+            <GoogleAd variant="sidebar" label="Sponsored" />
+          </div>
         </aside>
 
         {/* Main Jobs Listing Area */}
         <main className="lg:col-span-8 xl:col-span-9 space-y-6">
+          {/* Top Google Ad Leaderboard */}
+          <GoogleAd variant="leaderboard" label="Advertisement" />
+
           {/* Top Bar Controls */}
           <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <span className="text-xs font-extrabold text-slate-700">
@@ -418,8 +427,14 @@ function JobsContent() {
           ) : totalJobs > 0 ? (
             <div className="space-y-6">
               <div className="grid grid-cols-1 gap-4">
-                {paginatedJobs.map((job) => (
-                  <JobCard key={job.id} job={job} />
+                {paginatedJobs.map((job, idx) => (
+                  <div key={job.id} className="space-y-4">
+                    <JobCard job={job} />
+                    {/* Insert Google In-Feed Ad after every 4th job card */}
+                    {(idx + 1) % 4 === 0 && idx !== paginatedJobs.length - 1 && (
+                      <GoogleAd variant="infeed" label="Sponsored Job Highlight" />
+                    )}
+                  </div>
                 ))}
               </div>
 

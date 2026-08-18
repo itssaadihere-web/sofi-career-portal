@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import GoogleAdScript from '@/components/GoogleAdScript'
 import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -31,6 +32,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <GoogleAdScript />
+      </head>
       <body className={inter.className}>
         <Toaster position="top-right" />
         <div className="flex min-h-screen flex-col justify-between">

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getClientSupabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
+import GoogleAd from '@/components/GoogleAd'
 import { Search, MapPin, Sparkles, Building2, Briefcase, ArrowRight } from 'lucide-react'
 
 function AnimatedCounter({ end, duration = 2200 }: { end: number; duration?: number }) {
@@ -246,6 +247,11 @@ export default function Homepage() {
         </div>
       </section>
 
+      {/* Google Ad Banner - Leaderboard */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <GoogleAd variant="leaderboard" label="Advertisement" />
+      </section>
+
       {/* Featured Jobs */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex items-center justify-between">
@@ -271,6 +277,11 @@ export default function Homepage() {
             <p className="text-xs text-slate-400 mt-1">Check back soon or post the first job!</p>
           </div>
         )}
+      </section>
+
+      {/* Google Ad Banner - Infeed */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <GoogleAd variant="infeed" label="Sponsored Announcement" />
       </section>
 
       {/* Top Industries Grid */}

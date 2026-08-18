@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getClientSupabase } from '@/lib/supabase'
+import GoogleAd from '@/components/GoogleAd'
 import {
   Building2,
   MapPin,
@@ -318,6 +319,9 @@ export default function SingleJobPage() {
               </p>
             </div>
           )}
+
+          {/* Google Ad Unit - Content Banner */}
+          <GoogleAd variant="infeed" label="Sponsored Content" />
         </main>
 
         {/* Right Sidebar — Sticky Application & Match Card (35% ~ 4/12 cols) */}
@@ -439,6 +443,9 @@ export default function SingleJobPage() {
                 </div>
               </div>
             </div>
+
+            {/* Sidebar Google Ad Card */}
+            <GoogleAd variant="sidebar" label="Sponsored" />
 
             {/* Similar Jobs */}
             {similarJobs.length > 0 && (
