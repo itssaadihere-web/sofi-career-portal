@@ -11,7 +11,7 @@ import Script from 'next/script'
  * - NEXT_PUBLIC_GOOGLE_ADS_ID (e.g. AW-XXXXXXXXX or G-XXXXXXXXX)
  */
 export default function GoogleAdScript() {
-  const adSenseId = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID
+  const adSenseId = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID || 'ca-pub-7315986629947930'
   const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID
 
   return (

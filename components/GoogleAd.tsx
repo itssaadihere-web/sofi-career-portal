@@ -29,7 +29,7 @@ export default function GoogleAd({
 }: GoogleAdProps) {
   const adRef = useRef<HTMLModElement>(null)
   const [adLoaded, setAdLoaded] = useState(false)
-  const adSenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID
+  const adSenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID || 'ca-pub-7315986629947930'
 
   const slotId = adSlot || process.env.NEXT_PUBLIC_GOOGLE_AD_SLOT_DEFAULT
 

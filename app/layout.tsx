@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     template: '%s | Sophi Careers'
   },
   description: 'Find jobs that match your Sophi CV. AI-powered job matching for Pakistani professionals. Browse 500+ active jobs across Pakistan and Gulf.',
+  other: {
+    'google-adsense-account': 'ca-pub-7315986629947930',
+  },
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -33,6 +36,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="google-adsense-account" content="ca-pub-7315986629947930" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7315986629947930"
+          crossOrigin="anonymous"
+        />
         <GoogleAdScript />
       </head>
       <body className={inter.className}>
