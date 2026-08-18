@@ -31,7 +31,7 @@ export default function GoogleAd({
   const [adLoaded, setAdLoaded] = useState(false)
   const adSenseClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID || 'ca-pub-7315986629947930'
 
-  const slotId = adSlot || process.env.NEXT_PUBLIC_GOOGLE_AD_SLOT_DEFAULT
+  const slotId = adSlot || process.env.NEXT_PUBLIC_GOOGLE_AD_SLOT_DEFAULT || '3261345275'
 
   useEffect(() => {
     // Only attempt pushing if Google AdSense client ID is set and window.adsbygoogle is ready
@@ -91,7 +91,7 @@ export default function GoogleAd({
         ref={adRef}
         className="adsbygoogle block w-full"
         data-ad-client={adSenseClient}
-        data-ad-slot={slotId || '1234567890'}
+        data-ad-slot={slotId || '3261345275'}
         data-ad-format={adFormat}
         data-full-width-responsive={fullWidthResponsive ? 'true' : 'false'}
         style={{ display: 'block', ...style }}
